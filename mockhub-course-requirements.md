@@ -30,6 +30,14 @@ https://mockhub.kousenit.com on 2026-08-05. This is the input the frozen course 
 4. **Papercut:** `POST /acp/v1/checkout/{id}/complete` with no request body returns 500
    (NPE on `request.agentId()`); should be 400. Cosmetic, but students will hit it the
    first time they hand-roll a curl.
+5. **Papercut:** `POST /acp/v1/checkout/{id}/cancel` requires `{agentId, mandateId}` in
+   the body and 400s otherwise — easy to miss and the 400 carries no hint. Cost me two
+   silently-failing cleanup paths before I read the DTO. Either accept an empty body or
+   name the missing fields in the error.
+6. **Demo agents exist on the hosted instance:** `naive-demo-agent` and
+   `guarded-demo-agent` (both APPROVAL_REQUIRED, $500) are auto-minted by the demo
+   servers in `demos/`; the §2.4/§2.5 demo runs created a few real orders and approval
+   records on the buyer account. Demo reset clears them.
 
 ## Facts the course content should know (not bugs to fix)
 

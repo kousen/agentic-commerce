@@ -320,8 +320,9 @@ From the handoff document, in the order the course needs them:
 - **2026-08-05 (Ken): An MCP review is in scope.** The audience knows coding agents and has used MCP, but the course still reviews MCP — compressed, not skipped. Folded in as §1.0 (Module 1 45→50 min, slack 20→15).
 - **2026-08-05 (Ken): Course code stays small; MockHub is referenced, never rebuilt.** MockHub serves as the hosted platform and the source of excerpted examples. Everything students clone is course-sized.
 
+- **2026-08-05 (was Open #3): the §2.5 elicitation demo runs on the TypeScript v2 SDK.** A scripted host (`demos/src/test-guarded-client.ts`) proves the full multi-round-trip live against hosted MockHub: agent hits boundary → question in the host → human answers → purchase completes with a real approval artifact. Claude Code ≥2.1.76 renders elicitation interactively (verify once before class); Claude Desktop does not support elicitation at all.
+
 ## Open
 
 1. Is the repeat-purchase slice ready enough by delivery to demo live, or does §2.1 run from recording?
 2. Whether §3.5 (after the sale) is eight minutes or grows into a fourth module in a future longer version.
-3. Which client records the §2.5 elicitation demo (TypeScript reference client vs. Claude Desktop vs. other) — whichever works first wins.

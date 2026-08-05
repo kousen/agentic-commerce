@@ -1,0 +1,23 @@
+{
+  "name": "agentic-commerce-demos",
+  "private": true,
+  "type": "module",
+  "description": "MCP demo servers for the course: two-provider sourcing, naive self-approval, guarded elicitation",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "ticketnexus": "tsx src/ticketnexus.ts",
+    "seatstream": "tsx src/seatstream.ts",
+    "naive": "tsx src/naive-tools.ts",
+    "guarded": "tsx src/guarded-tools.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "tsx": "^4.19.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

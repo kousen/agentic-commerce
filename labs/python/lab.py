@@ -91,9 +91,10 @@ def agent_tries_to_complete(checkout_id: str, agent_id: str, mandate_id: str,
     )
 
 
-def cancel_checkout(checkout_id: str) -> None:
+def cancel_checkout(checkout_id: str, agent_id: str, mandate_id: str) -> None:
     requests.post(
         f"{BASE_URL}/acp/v1/checkout/{checkout_id}/cancel",
+        json={"agentId": agent_id, "mandateId": mandate_id},
         headers={**AGENT_HEADERS, "X-Buyer-Email": EMAIL},
         timeout=15,
     )

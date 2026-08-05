@@ -93,5 +93,9 @@ export const agentTriesToComplete = (checkoutId: string, agentId: string, mandat
     { ...AGENT_HEADERS, "X-Buyer-Email": EMAIL },
   );
 
-export const cancelCheckout = (checkoutId: string) =>
-  post(`/acp/v1/checkout/${checkoutId}/cancel`, {}, { ...AGENT_HEADERS, "X-Buyer-Email": EMAIL });
+export const cancelCheckout = (checkoutId: string, agentId: string, mandateId: string) =>
+  post(
+    `/acp/v1/checkout/${checkoutId}/cancel`,
+    { agentId, mandateId },
+    { ...AGENT_HEADERS, "X-Buyer-Email": EMAIL },
+  );

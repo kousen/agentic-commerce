@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "tickethub-guarded": { "command": "npx", "args": ["tsx", "src/guarded-tools.ts"] }
+  }
+}

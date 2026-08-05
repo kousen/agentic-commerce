@@ -71,8 +71,12 @@ def test_a_purchase_needing_approval_cannot_complete_without_one(token, agent_id
     mandate = create_mandate(
         token, agent_id, maxSpendPerTransaction="500.00", approvalMode="APPROVAL_REQUIRED"
     )
-    checkout = agent_tries_to_buy(agent_id, mandate["mandateId"],
-                                  pick_a_listing()["listingId"])
+    # A listing can be momentarily held by a classmate's run; try a few.
+    for _ in range(3):
+        checkout = agent_tries_to_buy(agent_id, mandate["mandateId"],
+                                      pick_a_listing()["listingId"])
+        if checkout.status_code == 201:
+            break
     assert checkout.status_code == 201, "staging the checkout is allowed"
     checkout_id = checkout.json()["checkoutId"]
 
@@ -81,7 +85,7 @@ def test_a_purchase_needing_approval_cannot_complete_without_one(token, agent_id
     assert response.status_code == 409, "completion should be refused"
     assert "requires an approved purchase approval" in response.json()["detail"]
 
-    cancel_checkout(checkout_id)
+    cancel_checkout(checkout_id, agent_id, mandate["mandateId"])
     revoke_mandate(token, mandate["mandateId"])
 
 

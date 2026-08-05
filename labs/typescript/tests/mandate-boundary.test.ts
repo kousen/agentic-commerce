@@ -61,8 +61,13 @@ test("a purchase needing approval cannot complete without one — no 'no' is not
   const agentId = freshAgentId();
   const mandate = await createMandate(token, agentId, "500.00", "APPROVAL_REQUIRED");
 
-  const listing = await pickAListing();
-  const checkout = await agentTriesToBuy(agentId, mandate.mandateId, listing.listingId);
+  // A listing can be momentarily held by a classmate's run; try a few.
+  let checkout!: Response;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const listing = await pickAListing();
+    checkout = await agentTriesToBuy(agentId, mandate.mandateId, listing.listingId);
+    if (checkout.status === 201) break;
+  }
   expect(checkout.status, "staging the checkout is allowed").toBe(201);
   const { checkoutId } = await checkout.json();
 
@@ -71,7 +76,7 @@ test("a purchase needing approval cannot complete without one — no 'no' is not
   expect(response.status, "completion should be refused").toBe(409);
   expect((await response.json()).detail).toContain("requires an approved purchase approval");
 
-  await cancelCheckout(checkoutId);
+  await cancelCheckout(checkoutId, agentId, mandate.mandateId);
   await revokeMandate(token, mandate.mandateId);
 });
 

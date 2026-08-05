@@ -90,8 +90,10 @@ public final class Lab {
                 "X-API-Key", ACP_KEY, "X-Buyer-Email", EMAIL);
     }
 
-    public static void cancelCheckout(String checkoutId) {
-        post("/acp/v1/checkout/" + checkoutId + "/cancel", "{}",
+    public static void cancelCheckout(String checkoutId, String agentId, String mandateId) {
+        post("/acp/v1/checkout/" + checkoutId + "/cancel",
+                """
+                {"agentId": "%s", "mandateId": "%s"}""".formatted(agentId, mandateId),
                 "X-API-Key", ACP_KEY, "X-Buyer-Email", EMAIL);
     }
 

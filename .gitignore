@@ -7,6 +7,7 @@ build/
 .DS_Store
 __pycache__/
 .pytest_cache/
+demos/grid/runs/
 
 # Conference-talk raw material (client name) — excluded pending Ken's call on publishing it
 ticketnetwork-agentic-commerce/

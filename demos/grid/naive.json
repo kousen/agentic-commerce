@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "tickethub": { "command": "npx", "args": ["tsx", "src/naive-tools.ts"] }
+  }
+}

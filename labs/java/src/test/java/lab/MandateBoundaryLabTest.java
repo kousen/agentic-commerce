@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.net.http.HttpResponse;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -66,8 +68,13 @@ class MandateBoundaryLabTest {
         var mandate = Lab.createMandate(token, agentId, "500.00", "APPROVAL_REQUIRED");
         var mandateId = mandate.get("mandateId").asText();
 
-        var checkout = Lab.agentTriesToBuy(agentId, mandateId,
-                Lab.pickAListing().get("listingId").asLong());
+        // A listing can be momentarily held by a classmate's run; try a few.
+        HttpResponse<String> checkout = null;
+        for (int attempt = 0; attempt < 3; attempt++) {
+            checkout = Lab.agentTriesToBuy(agentId, mandateId,
+                    Lab.pickAListing().get("listingId").asLong());
+            if (checkout.statusCode() == 201) break;
+        }
         assertThat(checkout.statusCode()).as("staging the checkout is allowed").isEqualTo(201);
         var checkoutId = Lab.json(checkout).get("checkoutId").asText();
 
@@ -76,7 +83,7 @@ class MandateBoundaryLabTest {
         assertThat(response.statusCode()).as("completion should be refused").isEqualTo(409);
         assertThat(response.body()).contains("requires an approved purchase approval");
 
-        Lab.cancelCheckout(checkoutId);
+        Lab.cancelCheckout(checkoutId, agentId, mandateId);
         Lab.revokeMandate(token, mandateId);
     }
 

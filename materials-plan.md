@@ -75,6 +75,10 @@ becomes it. Matches the other courses, where even the instructor guide is public
    nondeterministic and need iteration time; §2.5 also resolves design-doc Open #3 (which
    client can run it — whichever works first wins). The §3.1 grid needs 8–10 captured runs
    (transcripts/screenshots suffice until recording time), which is real calendar time.
+   ✅ *Done 2026-08-05 — `demos/` servers + `demo-runbook.md`; §2.4 self-approval captured
+   headlessly, §2.5 proven end-to-end on the TS v2 SDK, §3.1 grid run 16× across 3 models
+   (`demos/grid/GRID.md`). One pre-class task remains: verify Claude Code renders the
+   §2.5 elicitation interactively.*
 3. **Remaining demos** (§1.2 confused deputy, §2.1 ambiguity, §3.3 injection).
 4. **slides.md**, written around demos that already exist. Slides written before demos always
    get rewritten. When it lands, run the `slidev-pdf-release` skill to add the PDF-on-push

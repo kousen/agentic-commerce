@@ -1,0 +1,6 @@
+{
+  "mcpServers": {
+    "ticketnexus": { "command": "npx", "args": ["tsx", "src/ticketnexus.ts"] },
+    "seatstream": { "command": "npx", "args": ["tsx", "src/seatstream.ts"] }
+  }
+}
