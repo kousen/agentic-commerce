@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.gradle/
+*.zip
+*.pptx
+.DS_Store
+__pycache__/
+.pytest_cache/
+
+# Conference-talk raw material (client name) — excluded pending Ken's call on publishing it
+ticketnetwork-agentic-commerce/

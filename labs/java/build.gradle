@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.assertj:assertj-core:3.27.3'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        showStandardStreams = true
+    }
+}
+
+// The setup checkpoint: ./gradlew checkpoint
+// Runs only the connectivity test and prints the one line students paste into chat.
+tasks.register('checkpoint', Test) {
+    useJUnitPlatform {
+        includeTags 'checkpoint'
+    }
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    testLogging.showStandardStreams = true
+    outputs.upToDateWhen { false }
+}

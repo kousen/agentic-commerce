@@ -1,0 +1,13 @@
+{
+  "name": "mandate-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "checkpoint": "vitest run tests/checkpoint.test.ts",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
