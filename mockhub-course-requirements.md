@@ -1,101 +1,109 @@
 # What the course build surfaced for MockHub
 
 Findings from building and live-verifying the lab and demos against
-https://mockhub.kousenit.com on 2026-08-05. Everything here was hit in practice, not
-read off the source. Ordered by how much it would hurt during a live class.
+https://mockhub.kousenit.com on 2026-08-05. Everything here was hit in practice, not read
+off the source.
 
-## Bugs worth fixing
+**Status: the five code defects are fixed on the MockHub branch
+`feature/mandate-ceiling-uses-order-total` (four commits, full suite green at 1,269 tests).
+Not yet merged or deployed** — the hosted instance still runs the old behavior.
 
-### 0. The mandate ceiling is denominated in subtotal, but the customer is charged the total
+## Fixed
+
+### 0. The mandate ceiling was denominated in subtotal; the buyer is charged the total
 **The most consequential one, and it doubles as course material.**
-`AcpCheckoutService.java:345` validates the mandate against `cartDto.subtotal()`, so the
-service fee falls outside the ceiling entirely. A $35.00 per-transaction mandate authorizes
-a real charge of $35 + 10% ≈ $38.50.
+`AcpCheckoutService` validated mandates against `cartDto.subtotal()`, so the service fee fell
+outside the ceiling entirely: a $35.00 per-transaction mandate authorized ~$38.50.
 
-Observed live, with no attacker involved: an agent told "don't spend more than $35" bought
-a $32.15 listing and completed order `MH-20260805-0026` at **$35.37 all-in**, and another
-completed `MH-20260805-0025` at **$35.29**. One of the agents flagged the overrun itself,
-having noticed the fee only after the sale was final.
+Observed live, with no attacker involved: an agent told "don't spend more than $35" bought a
+$32.15 listing and completed order `MH-20260805-0026` at **$35.37 all-in**; another completed
+`MH-20260805-0025` at **$35.29**. One agent flagged the overrun itself, after the sale.
 
-Nobody lied and nothing was exploited. The mandate held, in its own units — which are not
-the units the customer was thinking in. Fix by validating against the all-in total (or
-making the ceiling's basis explicit in the schema and the API docs).
+Also found while fixing it: `completeCheckout` — the step that actually charges the buyer —
+never re-authorized at all. The order-total check existed but was wired only to
+`updateCheckout`, so a mandate could be revoked or outgrown between creating a checkout and
+completing it.
 
-*Course value: this is the thesis in miniature and it should probably become a slide in
-§2.3 — a bound whose units differ from the customer's intent is not a bound. It also
-supplies a natural eval condition for §3.4: "the amount charged never exceeds the
-customer's stated ceiling."*
+**Fix:** new `OrderPricing` record is the single place the fee is applied, used by both order
+creation and every authorization path (ACP, `OrderTools`, `CartTools`); `completeCheckout`
+now re-authorizes against the order total. Two existing tests asserted the subtotal behavior
+and were updated — the bug was pinned by its own tests.
 
-### 1. `maxPrice` / `minPrice` filter at the EVENT level, silently emptying results
-**The worst one.** `GET /acp/v1/listings?query=Monster&maxPrice=40` returns **zero
-listings** even though 50 Monster Jam listings are priced $30–$35. Cause:
-`AcpCatalogService.getListings` (backend/.../acp/service/AcpCatalogService.java:78-100)
-passes `minPrice`/`maxPrice` into the `EventSearchRequest` *and* into the per-listing
-`matchesFilters`. Any event whose price range extends past the cap is excluded whole, so
-its affordable listings never surface.
+### 1. `maxPrice`/`minPrice` filtered at the event level, silently emptying results
+`GET /acp/v1/listings?query=Monster&maxPrice=40` returned **zero** listings while 50 Monster
+Jam listings sat between $30 and $35. The bounds were passed to the event query as well as
+the listing filter, and event-level filtering compares against the event's own price range —
+so any event with a seat above the cap was dropped whole.
 
-Why it matters here: "find me a ticket under $60" is the single most natural agentic
-commerce query, and it returns nothing with no error — the agent concludes the event is
-sold out. Every course demo now filters prices client-side to route around it. Fix by
-dropping the price bounds from the event query and keeping only the listing-level filter.
+"Find me a ticket under $60" is the single most natural agentic-commerce query, and it failed
+silently: the agent concludes the event is sold out. **Fix:** price bounds apply per listing
+only, which is the question the caller asked.
 
-### 2. `POST /acp/v1/checkout/{id}/complete` with no body → 500
-Missing body NPEs on `request.agentId()` instead of returning 400. Students hand-rolling
-curl will hit this first thing.
+### 2. Missing or malformed request body returned 500
+No handler for `HttpMessageNotReadableException`, so it fell through the catch-all as
+"An unexpected error occurred." **Fix:** returns 400 naming the actual problem. Applies to
+every `@RequestBody` endpoint, not just ACP.
 
-### 3. `POST /acp/v1/checkout/{id}/cancel` requires `{agentId, mandateId}`, 400s with no hint
-Cost me two silently-failing cleanup paths before I read `AcpActionRequest`. The 400 body
-names no missing field. Either accept an empty body (the checkout already knows its agent
-and mandate) or name the fields in the error.
+### 3. Abandoned checkouts held seats indefinitely
+A checkout never completed or cancelled kept its listing unavailable forever; the next
+attempt on that seat failed with "no longer available" though nobody bought it. Hit
+repeatedly during demo iteration, and a real class-size risk with thirty students on shared
+inventory. **Fix:** the lifecycle sweep fails pending orders older than
+`mockhub.lifecycle.abandoned-checkout-minutes` (default 30), releasing the tickets via the
+existing `failOrder` path; an order completed concurrently is skipped, not fatal.
 
-### 4. Abandoned `CREATED` checkouts hold seats indefinitely
-Hit repeatedly during demo iteration: a checkout that is never completed or cancelled
-keeps its listing unavailable, and the next attempt on that listing fails with "no longer
-available." The lab retries other listings to survive it, but with thirty students
-hammering the same inventory a TTL sweep on stale `CREATED` checkouts would remove a
-real class-size failure mode.
+### 4. Documented-vs-actual idempotent retry
+The checkout endpoint advertised 200 on an idempotent retry but always returns 201 with the
+original order. **Fix:** corrected the documentation rather than the status code — the
+behavior is already correct and idempotent, and changing the code could break clients for a
+cosmetic gain.
 
-### 5. Documented-vs-actual: idempotent checkout retry
-`POST /api/v1/orders/checkout` advertises `200` for an idempotent retry but the controller
-unconditionally returns `201`. Harmless, but the take-home idempotency exercise would
-assert against the docs and fail.
+## Correction to an earlier finding
 
-## Needed before the course freeze (Track C5)
+I previously reported that `POST /acp/v1/checkout/{id}/cancel` "400s with no hint" when the
+`{agentId, mandateId}` body is missing. **That was wrong** — the validation handler does
+return a `fieldErrors` map naming each missing field. My cleanup path was failing for a
+different reason and I misattributed it. No change needed.
 
-1. **A course-specific ACP API key.** Demos and labs currently default to
-   `mockhub-dev-key`, which is in MockHub's source. A `course-2026` key rotatable after
-   each delivery is enough; everything reads `MOCKHUB_ACP_KEY`.
-2. **Demo reset before class** (`POST /api/v1/admin/demo/reset`). Two reasons: mandates
-   and orders accumulate, and §2.1's demo reads the buyer's order history — it should
-   anchor on the *seeded* history (Foo Fighters 100 Level $92, Green Day balcony $61,
-   Yo-Yo Ma orchestra $106), not on leftovers from rehearsal.
-3. **Second demo buyer account.** §1.2 needs two customers to demonstrate the confused
-   deputy. The demo server currently self-registers `alice@mockhub.com` /
-   `bob@mockhub.com` via `POST /api/v1/auth/register` — works, but seeding them (with a
-   little order history for Bob) would be cleaner and survives a demo reset.
+## Still outstanding (course-side workarounds exist)
 
-## Nice to have (course-side workaround exists)
+1. **A course-specific ACP API key.** Demos and labs default to `mockhub-dev-key`, which is
+   in MockHub's source. A `course-2026` key rotatable after each delivery is enough;
+   everything reads `MOCKHUB_ACP_KEY`.
+2. **Demo reset before class** (`POST /api/v1/admin/demo/reset`). §2.1's demo reads the
+   buyer's order history and should anchor on the *seeded* orders (Foo Fighters 100 Level
+   $92, Green Day balcony $61, Yo-Yo Ma orchestra $106), not on rehearsal leftovers.
+3. **Second demo buyer account.** §1.2 needs two customers. The demo server self-registers
+   `alice@mockhub.com` / `bob@mockhub.com` via `/api/v1/auth/register` — works, but seeding
+   them (with a little history for Bob) survives a demo reset.
+4. **Track A5, listing-text injection surface.** §3.3's demo provider attaches seller
+   descriptions to real listings and the agent's behavior is genuine; a real
+   `sellerDescription` field would let students see the hostile text on the live site.
+5. **No reversibility field in the mandate schema** (Track A4) — §2.3's reversibility gate
+   still needs it.
+6. **Track C3, second provider — no longer needed.** Two MCP facades over the same inventory
+   is *better* for the teaching point: identical inventory isolates tool-surface quality as
+   the only variable.
 
-- **Track A5, listing-text injection surface.** §3.3's demo provider attaches
-  seller-written descriptions to real MockHub listings, and the agent's behavior under
-  injection is genuine. A real `sellerDescription` field on listings would let students
-  see the hostile text on the live site, which lands harder than a facade adding it.
-- **Track C3, second provider — no longer needed.** The two-provider demo uses two MCP
-  facades over the same MockHub inventory, which is *better* for the teaching point
-  (identical inventory isolates tool-surface quality as the only variable).
-- **No reversibility field in the mandate schema** (Track A4) — §2.3's reversibility gate
-  still needs it; nothing in the schema expresses refundability today.
+## What the fixes change for the course
+
+- **The §2.3 units slide and the §3.3 payoff still stand.** They present captured evidence
+  from real orders, not a live reproduction — and "we found this while building the course,
+  here's the commit" is a better story than a bug left in place on purpose.
+- **The §3.3 demo still works after the fix.** Its agent's $35 ceiling now blocks the
+  poisoned $39.37 listing at $43.31 all-in while still allowing ~$30 seats at ~$34 all-in,
+  so the deterministic refusal the segment needs is intact — and now correct.
+- **The lab is unaffected.** All five assertions pass under the new behavior; the
+  approval-gate test still trips on the approval check before the new authorization check.
+- **Worth re-running** `labs/` and the demos against the fixed build once it is deployed.
 
 ## Facts the course content depends on
 
 - **Mandates are enforced only on the ACP path** (`/acp/v1/checkout`). Plain REST checkout
-  (`POST /api/v1/orders/checkout`) takes no agent/mandate context and enforces nothing;
-  MCP tools enforce but report errors as JSON strings, not HTTP statuses. The §1.2 demo
-  actively *uses* this gap (its naive tool buys through plain REST). Worth deciding
+  takes no agent/mandate context and enforces nothing; MCP tools enforce but report errors as
+  JSON strings, not HTTP statuses. The §1.2 demo actively *uses* this gap. Worth deciding
   whether that stays a teachable gap or gets closed.
-- **Self-approval is blocked structurally on MCP** (approve/deny tools deliberately
-  removed, commit `2acc16c`) and guarded only by the human's JWT on REST. This is exactly
-  the §2.4 narrative and the lab's credential-separation test.
+- **Self-approval is blocked structurally on MCP** (approve/deny tools deliberately removed,
+  commit `2acc16c`) and guarded by the human's JWT on REST — exactly the §2.4 narrative.
 - **Demo agents on the hosted instance:** `naive-demo-agent`, `guarded-demo-agent`,
-  `injection-demo-agent` (auto-minted by the demo servers), plus per-run lab agents.
-  Demo reset clears them.
+  `injection-demo-agent`, plus per-run lab agents. Demo reset clears them.
