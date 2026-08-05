@@ -80,9 +80,14 @@ becomes it. Matches the other courses, where even the instructor guide is public
    (`demos/grid/GRID.md`). One pre-class task remains: verify Claude Code renders the
    §2.5 elicitation interactively.*
 3. **Remaining demos** (§1.2 confused deputy, §2.1 ambiguity, §3.3 injection).
+   ✅ *Done 2026-08-05 — all three built course-side; none required MockHub changes first.
+   §3.3's lesson changed shape (see design doc + runbook).*
 4. **slides.md**, written around demos that already exist. Slides written before demos always
    get rewritten. When it lands, run the `slidev-pdf-release` skill to add the PDF-on-push
    GitHub Action (not before — the action would fail on a repo with no slides).
+   ✅ *Done 2026-08-05 — 94 slides, Slidev/seriph, Mermaid diagrams for the MCP shape, tool-call
+   lifecycle, PurchaseProfile boundary, and the MRTR round-trip. PDF workflow live; rolling
+   download at `releases/latest/download/agentic-commerce-slides.pdf`.*
 5. **instructor-guide.md + demo-runbook.md** finalized from what the rehearsal actually looked
    like; spec-map.md accumulates throughout.
 6. **Recordings, then O'Reilly Google Doc sync, last.** Recording happens only after the
