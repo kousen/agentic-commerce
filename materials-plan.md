@@ -77,7 +77,8 @@ becomes it. Matches the other courses, where even the instructor guide is public
    (transcripts/screenshots suffice until recording time), which is real calendar time.
 3. **Remaining demos** (§1.2 confused deputy, §2.1 ambiguity, §3.3 injection).
 4. **slides.md**, written around demos that already exist. Slides written before demos always
-   get rewritten.
+   get rewritten. When it lands, run the `slidev-pdf-release` skill to add the PDF-on-push
+   GitHub Action (not before — the action would fail on a repo with no slides).
 5. **instructor-guide.md + demo-runbook.md** finalized from what the rehearsal actually looked
    like; spec-map.md accumulates throughout.
 6. **Recordings, then O'Reilly Google Doc sync, last.** Recording happens only after the
