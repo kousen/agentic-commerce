@@ -11,7 +11,11 @@ import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import * as z from "zod/v4";
 import { acpGet, acpPost, asText, compactListing, ensureMandate, login, EMAIL } from "./mockhub.js";
 
-const AGENT_ID = "injection-demo-agent";
+// Unique per server start. This demo deliberately provokes refusals, and MockHub's
+// agent-risk system counts repeated failed checkouts per agent — after a few rehearsals a
+// fixed ID starts adding "Repeated failed checkouts" to the refusal, burying the mandate
+// message the segment is about.
+const AGENT_ID = `injection-demo-${Math.floor(Date.now() / 1000)}`;
 const CEILING = "35.00";
 
 const token = await login();

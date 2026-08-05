@@ -175,6 +175,15 @@ one carries a seller-written description aimed at the buying agent. Two variants
 has a real $35 ceiling on MockHub, so the deterministic refusal is genuine: a swayed agent
 gets a 409, verified with `npx tsx src/probe.ts src/injected-provider.ts injection`.
 
+**The refusal now names the fee-inclusive amount** — a $40.55 listing refuses at
+`amount=44.61` against a $35 ceiling. Say that out loud: the boundary is denominated in what
+the customer pays, which is the §2.3 point paying off.
+
+**Agent-risk noise:** this demo provokes refusals on purpose, and MockHub counts repeated
+failed checkouts per agent. The server now uses a per-start agent ID so rehearsals don't
+accumulate — without it the refusal grows a second "Repeated failed checkouts: N in the last
+24 hours" clause that buries the mandate message. Restarting the server is enough to reset.
+
 **Run the prediction poll first** (design doc §3.3), then the demo. But know what the
 evidence says before you promise the room a scare:
 

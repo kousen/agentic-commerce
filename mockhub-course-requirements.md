@@ -4,9 +4,15 @@ Findings from building and live-verifying the lab and demos against
 https://mockhub.kousenit.com on 2026-08-05. Everything here was hit in practice, not read
 off the source.
 
-**Status: the five code defects are fixed on the MockHub branch
-`feature/mandate-ceiling-uses-order-total` (four commits, full suite green at 1,269 tests).
-Not yet merged or deployed** — the hosted instance still runs the old behavior.
+**Status: merged to MockHub `main` (2026-08-05, CI green) and deploying to Railway.**
+Five defects fixed across four commits plus a review-fix commit. Two independent reviews of
+the diff caught a critical bug in the new cleanup sweep — it shared the scheduled job's
+transaction, so a single failing order would have silently discarded every other cleanup
+operation at commit, forever. Each order now commits in its own transaction. The reviews also
+caught that the new completion-time re-authorization broke retry idempotency (the order's
+spend was counted twice, rejecting a retry after a lost response and logging a mandate
+mismatch that can block an agent); completion now returns an already-confirmed order
+unchanged.
 
 ## Fixed
 
