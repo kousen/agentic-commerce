@@ -1,0 +1,1 @@
+{ "mcpServers": { "seatserve": { "command": "npx", "args": ["tsx", "src/injected-provider.ts"] } } }

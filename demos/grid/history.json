@@ -1,0 +1,1 @@
+{ "mcpServers": { "tickethub-history": { "command": "npx", "args": ["tsx", "src/like-last-time.ts"] } } }

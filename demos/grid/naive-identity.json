@@ -1,0 +1,1 @@
+{ "mcpServers": { "tickethub-naive-v1": { "command": "npx", "args": ["tsx", "src/naive-identity.ts"] } } }
