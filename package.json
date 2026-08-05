@@ -1,0 +1,17 @@
+{
+  "name": "agentic-commerce",
+  "version": "1.0.0",
+  "description": "Agentic Commerce — O'Reilly Live Learning course materials",
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build",
+    "export": "slidev export --output agentic-commerce-slides.pdf"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^51.8.1",
+    "@slidev/theme-seriph": "^0.25.0",
+    "playwright-chromium": "^1.53.1",
+    "slidev-component-progress": "^1.1.0"
+  }
+}

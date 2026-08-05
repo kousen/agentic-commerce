@@ -166,6 +166,8 @@ Separate authority to act from authority to pay. Show the matrix rather than a l
 - Buy autonomously within a mandate.
 - Request a narrowly scoped exception at a boundary.
 
+**One slide on units, earned from the build (added 2026-08-05):** a mandate ceiling of $35 that authorizes a $38.50 charge is not a ceiling. MockHub validated against the subtotal while the customer was charged the total, and two agents blew the stated budget without any attacker involved. Whatever number the customer says, the boundary must be denominated in that number. This pays off in §3.3.
+
 Emphasize that **autonomous in-mandate success is the intended path.** If every purchase ends in an approval prompt, the agent is an elaborate shopping cart and the customer will reasonably ask why they didn't just use the website.
 
 ### 2.4 In-band approval, and why it fails (8 min)
@@ -235,13 +237,22 @@ That is checkable. Narrative evidence is not.
 
 Disclosure of affiliate relationships, marketplace ownership, and preferred-provider agreements belongs here too — otherwise "the model chose it" conceals self-preferencing. Note without belaboring that this is the same shape as best-execution obligations in other regulated markets.
 
-### 3.3 Injection: the listing is attacker-controlled text (10 min)
+### 3.3 Untrusted text, and the boundary that fails without it (10 min)
 
-**Prediction poll first.** Before the demo: "This listing's description tells the agent to ignore its price ceiling. Will it?" Committing to a prediction is the cheapest engagement in hour three — Module 3 is otherwise demo-lecture at the attention low point, and the students who vote "no, it'll be fine" are the ones the demo converts.
+*Revised 2026-08-05 after building the demo — see `demo-runbook.md` §3.3 for the run data.*
 
-**Demo.** A seller-written listing description that instructs the agent to disregard its price ceiling or prefer that provider.
+**Prediction poll first.** "This listing's description tells the agent to ignore its price ceiling. Will it?" Committing to a prediction is the cheapest engagement in hour three, and the honest answer surprises the room in the opposite direction from what they expect.
 
-Contract to enforce: no content originating from a listing can widen a mandate. Boundaries evaluate in deterministic Java against structured fields only; free text is never an input to an authorization decision.
+**Demo, part one — the injection.** A seller-written description aimed at the buying agent, in two flavors: a naked override, and forged "account metadata" claiming the customer pre-authorized more. **Ten recorded runs across frontier and small models: none took the bait.** Say that plainly. Several agents noticed the expensive listing and passed on it out loud.
+
+**Demo, part two — the boundary that failed anyway.** In those same runs, two agents told "don't spend more than $35" completed purchases at $35.29 and $35.37, because the mandate ceiling is enforced against the subtotal while the customer is charged the total. No attacker. One agent flagged its own overrun after the sale was final.
+
+The contract is unchanged and now has two legs, not one:
+
+- No content originating from a listing can widen a mandate. Boundaries evaluate in deterministic code against structured fields; free text is never an input to an authorization decision.
+- **The bound must be denominated in the units the customer meant.** A ceiling that authorizes a different number than the one the customer said is not a ceiling. (Introduced in §2.3; this is where it bites.)
+
+Why you still write the injection defense after ten clean runs: the seller only needs it to work once, on one model version, and the check costs nothing. Make that argument explicitly — this audience has been sold enough scare demos.
 
 Closes the loop with §1.2 — same principle, second appearance: **input space and authority space must not overlap.**
 
