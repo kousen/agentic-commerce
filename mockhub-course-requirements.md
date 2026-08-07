@@ -73,15 +73,20 @@ different reason and I misattributed it. No change needed.
 
 ## Still outstanding (course-side workarounds exist)
 
-1. **A course-specific ACP API key.** Demos and labs default to `mockhub-dev-key`, which is
-   in MockHub's source. A `course-2026` key rotatable after each delivery is enough;
-   everything reads `MOCKHUB_ACP_KEY`.
+1. ~~**A course-specific ACP API key.**~~ **Done at `course-2026` (MockHub #309):**
+   `AcpApiKeyFilter` accepts extra comma-separated keys from the `ACP_EXTRA_API_KEYS`
+   env var alongside `mockhub-dev-key`. Remaining step is operational: Ken sets the
+   course key on Railway before first delivery and rotates it after each one.
 2. **Demo reset before class** (`POST /api/v1/admin/demo/reset`). §2.1's demo reads the
    buyer's order history and should anchor on the *seeded* orders (Foo Fighters 100 Level
    $92, Green Day balcony $61, Yo-Yo Ma orchestra $106), not on rehearsal leftovers.
-3. **Second demo buyer account.** §1.2 needs two customers. The demo server self-registers
-   `alice@mockhub.com` / `bob@mockhub.com` via `/api/v1/auth/register` — works, but seeding
-   them (with a little history for Bob) survives a demo reset.
+   Still a pre-class operational step; note the reset now *preserves* orders tagged with
+   `demo-seed-*` idempotency keys instead of cancelling them.
+3. ~~**Second demo buyer account.**~~ **Done at `course-2026` (MockHub #308):**
+   `DemoAccountSeeder` seeds `alice@mockhub.com` / `bob@mockhub.com` (same passwords the
+   demos used) in every environment, with 3 confirmed orders of history for Bob that
+   survive demo reset. Password drift is reverted on startup; kill switch
+   `DEMO_SEED_ACCOUNTS=false`.
 4. **Track A5, listing-text injection surface.** §3.3's demo provider attaches seller
    descriptions to real listings and the agent's behavior is genuine; a real
    `sellerDescription` field would let students see the hostile text on the live site.

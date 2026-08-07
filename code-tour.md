@@ -3,13 +3,14 @@
 The `examples/` directory shows each pattern at its smallest. This tour shows where the
 same patterns live in MockHub — the real Spring Boot 4 / Java 25 codebase behind every
 demo in the course — with the load-bearing lines cited. Read it with the source open:
-`github.com/kousen/mockhub`, pinned at commit **`775be23`** (2026-08-05, the build with
-the fee-inclusive mandate fix). All paths are repo-relative; line numbers drift, names
-mostly don't.
+`github.com/kousen/mockhub`, pinned at tag **`course-2026`** (commit `2fe9820`,
+2026-08-07 — the frozen course release: the fee-inclusive mandate fix plus the
+course-readiness fixes in PRs #308–#312). All paths are repo-relative; line numbers
+drift, names mostly don't.
 
-Counted at that commit: **1,272 backend tests** across 154 test classes, 528 frontend
-specs. The repo's own `docs/agentic-commerce.md` (~600 lines) covers this ground in
-prose and is worth a read on its own.
+Counted at that tag: **1,301 backend tests**, 473 frontend specs plus the Playwright
+E2E suite. The repo's own `docs/agentic-commerce.md` (~600 lines) covers this ground
+in prose and is worth a read on its own.
 
 ## The layout, in one paragraph
 
@@ -36,10 +37,12 @@ Two documents, two serving mechanisms:
   and four skills with example utterances (`buildSkills()`, `:67–114`). The base URL is
   configuration (`mockhub.public-base-url`), so dev and prod cards are both truthful.
 
-A live drift example the course can point at: `llms.txt` says the DCR endpoint is
+A drift example the course build caught: `llms.txt` said the DCR endpoint is
 `POST /connect/register`, while a stale javadoc in `McpOAuth2SecurityConfig.java:104`
-says `/oauth2/register`. Generated documents can't disagree with the code; maintained
-ones eventually do.
+said `/oauth2/register` — two maintained documents about the same endpoint,
+disagreeing. Fixed at the `course-2026` tag (#312), which is itself the teaching
+beat: generated documents can't disagree with the code; maintained ones eventually
+do, and someone has to notice.
 
 ---
 
@@ -143,10 +146,14 @@ on cancellation (`:202–204`), floored at zero — under a **pessimistic row lo
 wrong and a $1,000 limit quietly becomes $3,000; MockHub's answer is boring,
 deliberate locking, not cleverness.
 
-**A gap, on purpose left visible:** the MCP `revokeMandate` tool calls the
+**A gap the course build closed:** the MCP `revokeMandate` tool used to call the
 single-argument service overload, which performs **no ownership check** — any valid MCP
-credential can revoke any mandate by ID. The REST endpoint checks. "Where would you
-tighten this?" is a better slide than pretending it isn't there.
+credential could revoke any mandate by ID, while the REST endpoint checked. Fixed at
+the `course-2026` tag (#310): the tool now resolves the acting user through
+`ChatContext` and calls the same ownership-checked overload as REST. The teaching move
+survives the fix: show the two doors side by side and ask why one of them stayed
+unlocked for three months — parallel entry points drift unless a test pins them
+together.
 
 ---
 
@@ -258,12 +265,16 @@ become a ticket-exfiltration channel.
 
 **Idempotency, merchant-side.** `orders.idempotency_key` with a partial unique index
 (`V16`, `WHERE idempotency_key IS NOT NULL`); the retry short-circuit runs before any
-cart work and returns the original order (`OrderService.java:89–95`). REST reads the
-key from the `Idempotency-Key` header; ACP takes it as a body field. Known gap: the
-concurrent-duplicate race (two same-key requests both missing the lookup) falls through
-to a raw constraint violation instead of returning the original order — the DB
-guarantee holds, the graceful path doesn't. Take-home: find it, fix it, and note that
-the lab's retry test wouldn't catch it. Concurrency bugs need concurrent tests.
+cart work and returns the original order — now scoped to the requesting user, so a
+key held by a *different* user is a 409, not a window into their order. REST reads the
+key from the `Idempotency-Key` header; ACP takes it as a body field. The
+concurrent-duplicate race (two same-key requests both missing the lookup) used to fall
+through to a raw constraint violation as a 500; fixed at the `course-2026` tag (#311):
+the entry points catch the loser's failure outside the rolled-back transaction and
+answer with the winner's order. The take-home stands, upgraded: read the fix and its
+concurrency tests (`IdempotencyConcurrencyIntegrationTest`) and explain why the
+same-thread retry tests could never have caught the bug. Concurrency bugs need
+concurrent tests.
 
 ---
 
@@ -280,6 +291,7 @@ the lab's retry test wouldn't catch it. Concurrency bugs need concurrent tests.
 | Lab 2 (guarded tool) | `OrderTools`/`CartTools` eval gating, refusal phrasing (yours names the cap; MockHub's doesn't — argue it out) |
 | `course-client/` sourcing | the buyer-side mirror of `compareTickets`' reasons-not-rows philosophy |
 
-*Facts in this tour were verified against `main@775be23` on 2026-08-07. MockHub has no
-git tags yet; cutting `course-2026` as the frozen release remains on Ken's list
-(`mockhub-course-requirements.md`).*
+*Facts in this tour were verified against the `course-2026` tag (`2fe9820`) on
+2026-08-07 — MockHub's first git tag, cut after the course-readiness fixes (#308–#312)
+were merged, deployed, and re-verified against all three lab tracks and the demo
+probes on the hosted instance.*
