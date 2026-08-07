@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "guarded-ticket-shop": {
+      "command": "./build/install/guarded-tool-lab/bin/guarded-tool-lab",
+      "args": []
+    }
+  }
+}

@@ -1,5 +1,13 @@
 # Training Materials Plan (APPROVED — Ken, 2026-08-05)
 
+> **Superseded in part, 2026-08-07:** the course was redesigned merchant-side around the
+> Front Door structure (design doc v2) after Ken's review of the v1 materials. This
+> document remains the record of the v1 build; the v2 deliverables delta —
+> `examples/`, `labs/guarded-tool/`, `code-tour.md`, `course-client/`, and the
+> `slides.md` rewrite — is specified in `agentic-commerce-course-design.md` §Deliverables.
+> The **spec-complexity firewall below is retired** (specs are taught on slides again);
+> the audience baseline, polyglot-lab, and repo sections still stand.
+
 Plan for building the actual course materials from `agentic-commerce-course-design.md` (canonical).
 Follows the file conventions of Ken's existing courses (claude-code-training, codex-training,
 spring-and-spring-boot). Once approved, move accepted decisions to the AGENTS.md Decision Log.

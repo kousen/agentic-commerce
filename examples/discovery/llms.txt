@@ -1,0 +1,228 @@
+# MockHub API — llms.txt
+# Secondary concert ticket marketplace
+
+> MockHub is a secondary ticket marketplace for concerts, sports, theater, comedy, and festivals.
+> This file describes the public API for AI agents.
+
+## Base URL
+/api/v1
+
+## Authentication
+POST /api/v1/auth/login — JSON body: {"email", "password"} → {"accessToken", "expiresIn", "user"}
+POST /api/v1/auth/register — JSON body: {"email", "password", "firstName", "lastName", "phone"} → {"accessToken", "expiresIn", "user"}
+POST /api/v1/auth/refresh — Refresh access token via HttpOnly cookie
+GET /api/v1/auth/me — Get current user profile
+PUT /api/v1/auth/me — Update profile. JSON body: {"firstName", "lastName", "phone"}
+POST /api/v1/auth/oauth2/exchange?code={code} — Exchange OAuth2 one-time code for JWT. Code is a query parameter, not a JSON body.
+GET /api/v1/auth/me/providers — List linked OAuth providers for current user
+OAuth2 login: /oauth2/authorization/{google|github|spotify}
+Authenticated requests: Authorization: Bearer <accessToken>
+
+## Buyer Preferences (requires auth)
+GET /api/v1/preferences/me — Get current user's ticket-shopping preferences
+PUT /api/v1/preferences/me — Replace current user's ticket-shopping preferences. JSON body: {"preferredArtists": [], "preferredCategories": [], "preferredCities": [], "preferredVenues": [], "preferredSections": [], "dislikedVenues": [], "dislikedCategories": [], "maxTotalPrice": number, "maxServiceFeePercent": number, "allInPriceOnly": boolean, "accessibilityNeeds": string, "riskTolerance": "CHEAPEST|BEST_VALUE|BEST_SEATS|LOW_RISK_ONLY", "willingToWaitForPriceDrops": boolean}
+
+## Events (public, no auth required)
+GET /api/v1/events — List events with search/filter/pagination
+  Query params: q, category, tags, city, dateFrom, dateTo, minPrice, maxPrice, status, sort, page, size
+  Returns: {"content": [EventSummary], "page", "size", "totalElements", "totalPages"}
+GET /api/v1/events/featured — Featured events list
+GET /api/v1/events/{slug} — Event detail by slug
+GET /api/v1/events/{slug}/listings — Active ticket listings for an event (returns full list, not paginated)
+GET /api/v1/events/{slug}/sections — Section availability with pricing
+GET /api/v1/events/{slug}/price-history — Price history snapshots
+GET /api/v1/events/{slug}/predicted-price — AI price prediction (requires AI profile)
+
+## Categories (public)
+GET /api/v1/categories — List all event categories
+
+## Venues (public)
+GET /api/v1/venues — List all venues
+GET /api/v1/venues/{slug} — Venue detail by slug
+
+## Search (public)
+GET /api/v1/search?q={query} — Full-text event search
+GET /api/v1/search/suggest?q={query} — Search suggestions/autocomplete
+
+## Spotify (public, requires spotify profile)
+GET /api/v1/spotify/artists/{spotifyArtistId} — Artist metadata, genres, follower count
+
+## AI Features (requires AI provider profile)
+POST /api/v1/chat — Chat with AI assistant. JSON body: {"message": "string", "conversationId": number}
+GET /api/v1/recommendations — AI-ranked event recommendations. Response includes preferenceContext when stored buyer preferences are available.
+GET /api/v1/events/{slug}/predicted-price — AI price prediction
+
+## Cart (requires auth)
+GET /api/v1/cart — Get current cart
+POST /api/v1/cart/items — Add listing to cart. JSON body: {"listingId": number}
+DELETE /api/v1/cart/items/{itemId} — Remove item from cart
+DELETE /api/v1/cart — Clear cart
+
+## Favorites (requires auth)
+GET /api/v1/favorites — List favorited events
+POST /api/v1/favorites/{eventId} — Add event to favorites
+DELETE /api/v1/favorites/{eventId} — Remove event from favorites
+GET /api/v1/favorites/check/{eventId} — Check if event is favorited
+
+## Seller Listings (requires auth)
+POST /api/v1/listings — Create a listing. JSON body: {"eventSlug", "sectionName", "rowLabel", "seatNumber", "price"}
+GET /api/v1/my/listings — List seller's own listings. Query param: status (ACTIVE|SOLD|CANCELLED)
+PUT /api/v1/listings/{id}/price — Update listing price. JSON body: {"price": number}
+DELETE /api/v1/listings/{id} — Deactivate a listing (sets status CANCELLED, returns ticket to available)
+GET /api/v1/my/owned-tickets — Tickets from confirmed orders available to relist. Returns: [{ticketId, eventSlug, eventName, eventDate, venueName, sectionName, rowLabel, seatNumber, ticketType, faceValue}]
+GET /api/v1/my/earnings — Seller earnings summary with recent sales
+
+## Checkout (requires auth)
+POST /api/v1/orders/checkout — Create order from cart. JSON body: {"paymentMethod": "mock"|"stripe"}. Optional header: Idempotency-Key
+
+## Orders (requires auth)
+GET /api/v1/orders — List user's orders (paginated)
+GET /api/v1/orders/{orderNumber} — Order detail
+GET /api/v1/orders/{orderNumber}/calendar — Download .ics calendar file for event
+GET /api/v1/orders/{orderNumber}/agent-evidence — Owner/admin-scoped agent purchase evidence trail: mandate, approval, scoped payment credential, checkout, risk, eval, actor timeline, and fulfillment artifacts
+
+## Ticket Download (requires auth)
+GET /api/v1/orders/{orderNumber}/tickets/{ticketId}/download — Download ticket PDF with QR code
+
+## Public Ticket View (no auth — token-authenticated)
+GET /api/v1/tickets/view?token={orderViewToken} — View order tickets with QR codes (mobile-optimized)
+GET /api/v1/tickets/{orderNumber}/{ticketId}/qr?token={orderViewToken} — QR code PNG image
+
+## Ticket Verification (public, no auth)
+GET /api/v1/tickets/verify?token={jwt} — Verify ticket QR code token
+  Returns: {"valid", "orderNumber", "ticketId", "eventSlug", "sectionName", "rowLabel", "seatNumber", "alreadyScanned", "scannedAt", "message"}
+
+## Payments (requires auth except webhook)
+POST /api/v1/payments/create-intent — Create payment intent. JSON body: {"orderNumber": "string"}
+POST /api/v1/payments/confirm — Confirm payment. JSON body: {"paymentIntentId": "string"}
+POST /api/v1/payments/webhook — Stripe webhook (no auth, signature verified)
+
+## Error Format
+All errors use RFC 9457 Problem Details:
+{"type", "title", "status", "detail", "instance"}
+
+## Evaluation Conditions
+MockHub implements evaluation conditions (sanity checks) on AI services and MCP tool actions.
+Deterministic checks verify domain invariants (event in future, listing active, price plausible).
+AI-as-judge checks verify response grounding (no fabricated events, prices, or dates).
+AgentRiskCondition reads persisted local risk signals for the user/agent pair.
+Eval results are logged for observability. Critical eval failures may block agent actions, including repeated mandate mismatches.
+
+## MCP Tools (OAuth 2.1 authentication)
+MockHub exposes MCP tools for AI agents at /mcp (Streamable HTTP transport).
+Authentication: OAuth 2.1 with Dynamic Client Registration (DCR). Discovery endpoints:
+- /.well-known/oauth-protected-resource/mcp — MCP resource metadata (points to the authorization server)
+- /.well-known/oauth-authorization-server — authorization server metadata (issuer, token, authorize, jwks, registration)
+- /.well-known/oauth-authorization-server/mcp — RFC 8414 path-suffixed alias of the above (301 redirect)
+DCR endpoint: POST /connect/register. Clients register automatically.
+Compatible clients: Claude (desktop/web/mobile), Cursor, MCP Inspector, any OAuth 2.1 MCP client.
+Sessions are in-memory — after server redeploys, clients must re-initialize.
+- searchEvents(query?, category?, city?, page?, size?) — search and filter events with pagination
+- getEventDetail(slug) — full event details by URL slug
+- getEventListings(slug, page?, size?) — active listings for an event with pagination (default 20, max 50) plus the event commercePolicy
+- getFeaturedEvents() — curated featured events
+- getListingDetail(listingId) — single listing by ID, including commercePolicyUrl
+- findTickets(query?, category?, city?, dateFrom?, dateTo?, minPrice?, maxPrice?, section?, maxResults?, userEmail?) — RECOMMENDED: compound search returning matching listings sorted by price, including commercePolicyUrl for each listing. Date params are ISO-8601 strings (e.g. '2026-04-01T00:00:00Z'). If userEmail is supplied, stored buyer preferences may fill missing city/category/section/maxPrice filters and return preferenceContext metadata. Reduces round-trips from 3 to 1.
+- compareTickets(query?, category?, city?, dateFrom?, dateTo?, minPrice?, maxPrice?, section?, preferredSection?, maxResults?, userEmail?) — compare matching listings for agent shopping decisions. Returns ranked options, cheapest/best-value/best-section/lowest-risk picks, deterministic reason codes, rationale, and price plausibility warnings. If userEmail is supplied, stored buyer preferences may fill missing search filters/preferredSection and return preferenceContext metadata. Objective listing data is separate from heuristic judgment fields.
+- getCommercePolicy(eventSlug) — structured commerce policy for agent purchase decisions (refunds, cancellations, transfer, fees, support)
+- getPriceHistory(eventSlug) — historical price snapshots
+- getPricePrediction(eventSlug) — AI price forecast (requires AI provider)
+- getCart(userEmail) — current cart contents
+- addToCart(userEmail, listingId, agentId, mandateId) — add listing to cart (eval-gated). Returns full updated cart, so a separate getCart call is not needed. May include agent-risk warnings.
+- removeFromCart(userEmail, itemId) — remove cart item
+- clearCart(userEmail) — empty cart
+- refreshCart(userEmail) — reset cart 15-minute TTL without modifying contents
+- checkout(userEmail, paymentMethod, agentId, mandateId) — create order from cart. paymentMethod must be exactly "mock" or "stripe"; use "mock" for MockHub's built-in mock-payment flow. May include agent-risk warnings.
+- confirmOrder(userEmail, orderNumber, agentId, mandateId, paymentIntentId?, paymentCredentialId?, approvalId?) — complete payment; non-mock payments require paymentIntentId. Optional paymentCredentialId validates scoped payment authority before payment. Optional approvalId links the purchase to an approved audit record. May include agent-risk warnings.
+- getOrder(userEmail, orderNumber) — order details
+- listOrders(userEmail, page?, size?) — order history with pagination
+- getCalendarEntry(userEmail, orderNumber) — RFC 5545 .ics calendar content for a confirmed order
+- proposePurchase(userEmail, agentId, mandateId, proposedOrderSnapshot, agentRationale?, subtotal, serviceFee, total, commercePolicySnapshot?, expiresAt?) — create a durable purchase proposal audit record before user approval. Approval and denial are HUMAN-ONLY actions performed on the MockHub website (/my/approvals); there is deliberately no MCP tool for them, so an agent cannot approve its own proposal.
+- listPurchaseApprovals(userEmail) — list purchase proposals, approvals, denials, and outcomes
+- createMandate(agentId, userEmail, scope, maxSpendPerTransaction?, maxSpendTotal?, allowedCategories?, allowedEvents?, allowedSections?, approvalMode?, expiresAt?) — authorize agent actions
+- revokeMandate(mandateId) — revoke agent authorization
+- listMandates(userEmail) — list active mandates
+- validateMandate(agentId, userEmail, scope, amount?, categorySlug?, eventSlug?, sectionName?) — check if action is authorized by scope, spending limits, and category/event/section restrictions
+- getBestMandate(agentId, userEmail, eventSlug, categorySlug?, amount?, sectionName?) — RECOMMENDED before addToCart: finds the best matching mandate for a purchase action in one call
+- issuePaymentCredential(userEmail, agentId, maxAmount, currency?, usage?, backingPaymentMethod?, expiresAt?) — issue a scoped mock-backed payment credential for an agent. Defaults: currency=USD, usage=ONE_TIME, backingPaymentMethod=mock.
+- listPaymentCredentials(userEmail) — list active, consumed, revoked, and expired scoped payment credentials for a user
+- revokePaymentCredential(userEmail, credentialId) — revoke an active payment credential so it can no longer authorize payment
+- getAgentRiskSummary(userEmail, agentId) — get deterministic local risk summary for a user/agent pair, including recent signals, warning reasons, highest severity, and blocked status
+- getAgentPurchaseEvidence(userEmail, orderNumber) — get the read-only evidence trail for an agent-initiated order owned by the user
+
+## ACP Endpoints (Agentic Commerce Protocol, requires API key: X-API-Key header)
+ACP-compatible checkout endpoints at /acp/v1/:
+POST /acp/v1/checkout — Create checkout. JSON body: {"buyerEmail", "lineItems": [{"listingId", "quantity"}], "agentId", "mandateId", "paymentMethod": "mock"|"stripe", "idempotencyKey"}. If omitted, paymentMethod defaults to "mock".
+GET /acp/v1/checkout/{checkoutId} — Get checkout status. Header: X-Buyer-Email
+PUT /acp/v1/checkout/{checkoutId} — Update checkout (PENDING only). JSON body: {"agentId", "mandateId", "addItems", "removeListingIds"}. Header: X-Buyer-Email
+POST /acp/v1/checkout/{checkoutId}/complete — Complete checkout. JSON body: {"agentId", "mandateId", "paymentIntentId", "approvalId", "paymentCredentialId"}. Header: X-Buyer-Email
+POST /acp/v1/checkout/{checkoutId}/cancel — Cancel checkout. JSON body: {"agentId", "mandateId"}. Header: X-Buyer-Email
+GET /acp/v1/catalog — Browse product catalog. Query params: query, category, city, page, size
+GET /acp/v1/listings — Browse actionable ticket offers. Query params: query, category, city, dateFrom, dateTo, minPrice, maxPrice, section, page, size
+
+## Commerce Policies
+GET /api/v1/commerce/policies/default — Default agent-readable commerce policy
+GET /api/v1/commerce/policies/events/{eventSlug} — Event-scoped commerce policy
+Policy fields: policyId, version, eventSlug, policyUrl, updatedAt, sections[], supportContact, supportUrl.
+ACP catalog items, ACP listing items, ACP checkout responses, and MCP getEventListings include commercePolicy directly.
+MCP findTickets, compareTickets, and getListingDetail include commercePolicyUrl for each actionable listing.
+
+## Agent Mandates
+
+Mandates define what an agent is authorized to do on behalf of a user.
+Scope: BROWSE (read-only) or PURCHASE (can buy, subsumes BROWSE).
+Limits: per-transaction max, cumulative total budget, category/event/section restrictions, expiration.
+Approval mode: AUTO_PURCHASE allows direct completion; APPROVAL_REQUIRED requires an approved purchase approval before completion.
+Autonomous purchase actions require both agent identity and mandate proof.
+Managed via MCP MandateTools or directly via mandate service.
+
+## Scoped Payment Credentials
+
+Payment credentials are separate from mandates. A mandate proves the agent may act; a payment credential proves the agent may pay with a scoped mock-backed instrument.
+Fields: credentialId, userEmail, agentId, allowedMerchant=MOCKHUB, maxAmount, currency=USD, usage=ONE_TIME|REUSABLE, status=ACTIVE|CONSUMED|REVOKED|EXPIRED, backingPaymentMethod=mock, expiresAt.
+MCP `confirmOrder` and ACP `completeCheckout` accept optional `paymentCredentialId`. When supplied, MockHub validates user, agent, amount, currency, payment method, status, and expiration before payment confirmation, then consumes one-time credentials for the order number.
+
+## Buyer Preference Memory
+
+Buyer preferences store explicit ticket-shopping preferences separately from inferred Spotify/favorites signals.
+Fields include preferred artists/categories/cities/venues/sections, disliked venues/categories, max all-in price, max service fee tolerance, all-in price preference, accessibility needs, risk tolerance, and willingness to wait for price drops.
+Authenticated users manage preferences with `GET/PUT /api/v1/preferences/me`.
+MCP `findTickets` and `compareTickets` can accept `userEmail` to apply stored preferences and return `preferenceContext` metadata showing which filters or ranking hints were applied.
+AI recommendations include explicit preferences in the prompt when present and expose preferenceContext without exposing raw Spotify listening data.
+
+## Agent Risk Signals
+
+Agent risk signals are deterministic local records for agent shopping behavior. They are not an external fraud score.
+Signals include cart hold attempts, rapid cart holds, checkout attempts, mandate mismatches, failed checkouts, high-spend attempts, payment-credential failures, and risk-condition blocks.
+AgentRiskCondition blocks repeated mandate mismatches as CRITICAL. Repeated failed checkouts, rapid cart holds, and high-spend attempts produce WARNING signals.
+MCP agents can call `getAgentRiskSummary(userEmail, agentId)` before or after a purchase flow.
+
+## Agent Purchase Evidence
+
+Agent purchase evidence is a read-only assembled record for a single order. It includes order/cart line items, mandate scope and budget, purchase approval state when present, scoped payment credential status and consumption, ACP-aligned checkout status, risk signals, derived eval outcomes, actor timeline entries, and ticket fulfillment artifacts.
+Use REST `GET /api/v1/orders/{orderNumber}/agent-evidence` as the authenticated owner/admin endpoint or MCP `getAgentPurchaseEvidence(userEmail, orderNumber)` for agent self-inspection.
+Email/SMS provider delivery receipts are not persisted; the evidence record marks those dispatch fields as not persisted instead of inventing provider IDs.
+
+### Mandate Lifecycle
+
+1. Create — User grants agent a mandate via createMandate tool. Defines scope, spending limits, allowed categories/events/sections, approval mode, and optional expiration.
+2. Validate — Every agent purchase action (addToCart, checkout, confirmOrder) triggers MandateCondition (CRITICAL severity). Checks: mandate active, not expired, scope covers action, within spending limits, allowed category/event/section.
+3. Spend Tracking — On order confirmation, the order total is recorded against the mandate's cumulative spend (totalSpent). Remaining budget = maxSpendTotal - totalSpent.
+4. Spend Reversal — If a confirmed order is cancelled via cancelOrder, the order total is reversed (subtracted from totalSpent), restoring available budget.
+5. Revoke — User revokes mandate via revokeMandate tool. Status set to REVOKED. Subsequent agent actions using this mandate are blocked.
+
+### Purchase Flow with Mandates
+
+findTickets(query, filters) → getBestMandate(agentId, userEmail, eventSlug, categorySlug?, amount?, sectionName?) → addToCart(userEmail, listingId, agentId, mandateId) → checkout(userEmail, paymentMethod="mock", agentId, mandateId) → confirmOrder(userEmail, orderNumber, agentId, mandateId)
+
+Each step validates the mandate via eval conditions. Spend is recorded on confirmation. If the order is later cancelled, spend is reversed.
+
+### Eval Conditions
+
+- MandateCondition (CRITICAL): Blocks actions without a valid mandate. Checks scope, per-transaction and cumulative spending limits, category/event/section restrictions.
+- SpendingLimitCondition (WARNING): Advisory alert when cart total exceeds $2000 (configurable). Does not block — mandate per-transaction limits are the hard stop.
+- AgentRiskCondition (WARNING/CRITICAL): Warns on recent risk reasons and blocks repeated mandate mismatches for the same user/agent pair.
+
+## Content Types
+Request: application/json
+Response: application/json

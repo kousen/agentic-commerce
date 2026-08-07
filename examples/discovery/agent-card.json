@@ -1,0 +1,93 @@
+{
+    "name": "MockHub",
+    "description": "Secondary concert ticket marketplace with agentic commerce support. Search events, browse listings, manage cart, purchase tickets, and manage agent mandates via MCP tools.",
+    "supported_interfaces": [
+        {
+            "url": "https://mockhub.kousenit.com/mcp",
+            "protocol_binding": "mcp/streamable-http",
+            "protocol_version": "2025-03-26"
+        }
+    ],
+    "provider": {
+        "url": "https://mockhub.kousenit.com",
+        "organization": "MockHub"
+    },
+    "version": "1.0.0",
+    "documentation_url": "https://mockhub.kousenit.com/llms.txt",
+    "capabilities": {
+        "streaming": true,
+        "push_notifications": false
+    },
+    "security_schemes": {
+        "oauth2": {
+            "type": "oauth2",
+            "description": "OAuth 2.1 with Dynamic Client Registration",
+            "oauth2_metadata_url": "https://mockhub.kousenit.com/.well-known/openid-configuration"
+        }
+    },
+    "default_input_modes": [
+        "text/plain"
+    ],
+    "default_output_modes": [
+        "text/plain",
+        "application/json"
+    ],
+    "skills": [
+        {
+            "id": "ticket-search",
+            "name": "Ticket Search",
+            "description": "Search for events and available ticket listings by query, category, city, date range, price range, and section",
+            "tags": [
+                "search",
+                "events",
+                "tickets"
+            ],
+            "examples": [
+                "Find concerts in New York under $150",
+                "Search for orchestra seats under $150"
+            ]
+        },
+        {
+            "id": "ticket-purchase",
+            "name": "Ticket Purchase",
+            "description": "Complete a ticket purchase workflow: add to cart, checkout, and confirm order. Requires an active mandate.",
+            "tags": [
+                "purchase",
+                "cart",
+                "checkout",
+                "orders"
+            ],
+            "examples": [
+                "Buy the cheapest ticket that matches my budget",
+                "Add listing 42 to my cart and check out"
+            ]
+        },
+        {
+            "id": "mandate-management",
+            "name": "Mandate Management",
+            "description": "Create, list, validate, and revoke agent mandates that authorize agents to act on behalf of users",
+            "tags": [
+                "authorization",
+                "mandates",
+                "permissions"
+            ],
+            "examples": [
+                "Create a purchase mandate with a $200 per-transaction limit",
+                "Show my active mandates"
+            ]
+        },
+        {
+            "id": "price-analysis",
+            "name": "Price Analysis",
+            "description": "Get price history and AI-powered price predictions for events",
+            "tags": [
+                "pricing",
+                "analytics",
+                "predictions"
+            ],
+            "examples": [
+                "What's the price trend for the top result in this search?"
+            ]
+        }
+    ]
+}

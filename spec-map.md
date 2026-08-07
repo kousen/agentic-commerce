@@ -1,9 +1,10 @@
-# Spec Map — every acronym from the course, on one page
+# Spec Map — every spec from the course, on one page
 
-The course teaches *concepts* — mandate, approval, profile, evidence — because the concepts
-are stable and the specifications are moving. This page maps each concept to where the
-specs address it, with status as of **August 2026**. When a slide says "the specs call
-this…", the details live here.
+The course's Vocabulary segment introduces each specification — who's behind it, what
+problem it solves, what layer it occupies. This page is the depth behind those slides:
+concept-to-spec mapping, one-paragraph histories, and primary sources, with status as of
+**August 2026**. The concepts are stable; the specifications are moving — when a status
+matters, check the primary source.
 
 ## Course concept → specification
 

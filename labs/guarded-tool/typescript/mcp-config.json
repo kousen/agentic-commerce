@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "guarded-ticket-shop": {
+      "command": "npx",
+      "args": ["tsx", "src/server.ts"]
+    }
+  }
+}

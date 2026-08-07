@@ -1,0 +1,15 @@
+spring:
+  main:
+    web-application-type: none
+  ai:
+    anthropic:
+      # Only the 'agent' profile uses this; the placeholder keeps the default
+      # (deterministic) run bootable with no key configured.
+      api-key: ${ANTHROPIC_API_KEY:not-set}
+      chat:
+        options:
+          model: claude-sonnet-5
+
+mockhub:
+  base-url: ${MOCKHUB_URL:https://mockhub.kousenit.com}
+  acp-key: ${MOCKHUB_ACP_KEY:mockhub-dev-key}

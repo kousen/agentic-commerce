@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "guarded-ticket-shop": {
+      "command": ".venv/bin/python",
+      "args": ["server.py"]
+    }
+  }
+}

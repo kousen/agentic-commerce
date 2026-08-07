@@ -59,7 +59,7 @@ Giving it **bounded authority** to conduct commerce safely is the real engineeri
 
 <div class="pt-12 opacity-75">
 
-Everything today is in service of sharpening that one sentence, three times.
+Today we build the whole front door — and break the naive version of each part on the way.
 
 </div>
 
@@ -67,15 +67,16 @@ Everything today is in service of sharpening that one sentence, three times.
 
 # Where we're going
 
-| | |
-|---|---|
-| **Module 1** | Tools, identity, and the naive purchase |
-| **Module 2** | Authority, mandates, and approval |
-| **Module 3** | Sourcing, evidence, and evaluation |
+| | | |
+|---|---|---|
+| **Module 1** | The front door | discovery · connectivity · identity |
+| **Module 2** | Bounded authority | mandates · approval · **Lab 1** |
+| **Module 3** | Finishing the build | payment · guardrails · evidence · **Lab 2** |
 
-<div class="pt-8">
+<div class="pt-6">
 
-One hands-on lab (Module 2). Everything else is demo-driven, with runnable code you take home.
+Two hands-on labs. Every principle ships with its artifact — `examples/`, two lab
+scaffolds, a code tour of the real platform, and a buyer-side reference client.
 
 Repo: **github.com/kousen/agentic-commerce**
 
@@ -158,8 +159,7 @@ Amazon's **Auto Buy**, verbatim from the help page:
 
 - Prime members only
 - Fulfilled-by-Amazon items only
-- One active request per item
-- One unit per item
+- One active request per item, one unit per item
 - No promotional discounts or coupons
 - Up to 200 active requests
 - Cancellable any time before the order is placed
@@ -170,9 +170,83 @@ Amazon's **Auto Buy**, verbatim from the help page:
 
 <div class="pt-6">
 
-That is a **mandate specification** written in customer-service prose.
+That is a **mandate specification** written in customer-service prose — and the company
+with the strongest incentive to remove friction chose full autonomy only for the narrow
+single-SKU, price-triggered case.
 
-Amazon's *scheduled* recurring purchases add to the cart for review rather than shipping automatically.
+</div>
+
+</v-click>
+
+---
+layout: section
+---
+
+# The inversion
+
+---
+
+# Thirty years of bot defense assumed one thing
+
+<div class="pt-6">
+
+CAPTCHAs, rate limits, device fingerprinting, verified-fan queues —
+even a federal statute (the BOTS Act, 2016, actively enforced again since 2025).
+
+</div>
+
+<v-click>
+
+<div class="pt-8 text-xl text-center">
+
+**A bot on your site is an adversary.**
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-8">
+
+| The adversarial bot | The delegated agent |
+|---|---|
+| Impersonates a human | **Announces what it is** |
+| Anonymous, disposable | **Carries proof of who it works for** |
+| Buys 500 tickets to resell | Buys 2 tickets for its user |
+
+At the WAF they look identical. Behavior cannot tell them apart — **credentials can**.
+
+</div>
+
+</v-click>
+
+---
+
+# The industry scoreboard
+
+Every shipped ticketing integration — Ticketmaster in Google AI Mode, StubHub and
+SeatGeek in ChatGPT, the Claude connectors — **stops at the checkout boundary**.
+
+<v-click>
+
+<div class="pt-4">
+
+That's a legal and authority decision, not an engineering gap: with the FTC litigating
+under the BOTS Act, completing a purchase for a robot is a decision your legal
+department gets a vote on.
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-4">
+
+Meanwhile the card networks crossed the line in 2026: **Visa Intelligent Commerce** and
+**Mastercard Agent Pay** are live on real rails, with agents purchasing *within
+consumer-defined limits*.
 
 </div>
 
@@ -182,7 +256,43 @@ Amazon's *scheduled* recurring purchases add to the cart for review rather than 
 
 <div class="pt-4 text-xl">
 
-The company with the strongest incentive to remove friction chose full autonomy only for the narrow single-SKU, price-triggered case.
+The authorization machinery in this course is the prerequisite for crossing that line safely.
+
+</div>
+
+</v-click>
+
+---
+
+# The question this course answers
+
+<div class="pt-6 text-xl text-center">
+
+What if the customer visits your website **exactly once** —
+
+to say who is allowed to act for them?
+
+</div>
+
+<v-click>
+
+<div class="pt-8">
+
+What you have to build, in order — **the front door**:
+
+<div class="text-sm pt-2">
+
+**1. Discovery** — tell an agent you exist ·
+**2. Connectivity** — let it call you ·
+**3. Identity** — know whose agent it is ·
+**4. Authorization** — know what it may do ·
+**5. Guardrails & approval** — check it at every step ·
+**6. Payment authority** — separate may-act from may-pay ·
+**7. Evidence** — prove all of it later
+
+</div>
+
+Today walks that list. The failures along the way are why each step exists.
 
 </div>
 
@@ -218,7 +328,8 @@ CHECKPOINT OK — <track> — https://mockhub.kousenit.com
 
 <div class="pt-6 opacity-75">
 
-Nothing is taught here. We're surfacing setup failures ninety minutes before the lab needs setup to work.
+Nothing is taught here. We're surfacing setup failures ninety minutes before Lab 1 —
+and the same toolchain runs Lab 2.
 
 </div>
 
@@ -227,83 +338,340 @@ layout: section
 ---
 
 # Module 1
-## Tools, identity, and the naive purchase
+## The front door: discovery, connectivity, identity
 
 ---
 
-# MCP in five slides — 1: the shape
+# The vocabulary — none of this existed two years ago
 
-<div class="pt-4">
+Six specifications, one slide each, same skeleton every time:
 
-```mermaid {scale: 0.75}
-flowchart LR
-    U[You] --> H[Host<br/>Claude Code, Desktop, IDE]
-    H --> C[Client]
-    C -->|MCP| S1[Server: tickets]
-    C -->|MCP| S2[Server: payments]
-    S1 --> API1[(Marketplace API)]
-    S2 --> API2[(Payment API)]
-```
+<div class="pt-8 text-xl">
+
+**Who is behind it · what problem it solves · what layer it occupies · status**
 
 </div>
 
-<div class="pt-4">
+<div class="pt-8 opacity-75">
 
-The **host** owns the conversation and the UI. The **client** speaks MCP. The **server** exposes capability.
-
-Remember the host — it becomes the whole argument in Module 2.
+The concepts are stable; the specs are moving. Every acronym also lives in
+`spec-map.md` in the repo, with primary sources — slides give you the map, the handout
+gives you the depth.
 
 </div>
 
 ---
 
-# MCP in five slides — 2: what a server offers
+# MCP — Model Context Protocol
 
-| Primitive | Who drives it | We care today? |
-|---|---|---|
-| **Tools** | The model decides to call | **Yes — all of it** |
-| Resources | The application supplies as context | Not today |
-| Prompts | The user invokes deliberately | Not today |
-
-<div class="pt-8">
-
-Commerce is tools. Every failure in this course is a tool that did exactly what it was told.
-
-</div>
-
----
-
-# MCP in five slides — 3: one tool call
-
-```mermaid {scale: 0.7}
-sequenceDiagram
-    participant M as Model
-    participant C as Client
-    participant S as Server
-    M->>C: I want buyTickets(...)
-    C->>S: tools/call
-    S->>S: do the thing
-    S-->>C: result
-    C-->>M: result as context
-    M->>M: keep going
-```
-
-<div class="pt-4">
-
-Note what is **not** in this picture: any check on whether the model *should* have called it.
-
-</div>
-
----
-
-# MCP in five slides — 4: the 2026-07-28 revision
+**Anthropic → Agentic AI Foundation (Linux Foundation).** The most broadly adopted spec
+on this list, by a wide margin.
 
 <v-clicks>
 
-- **The protocol went stateless.** Session management left the protocol layer; no `initialize` handshake. MCP now behaves like an ordinary HTTP API.
-- **What that fixed:** sticky routing, shared session stores, sessions dying when a container is replaced.
-- **Elicitation became multi-round-trip** — the mechanism that saves us in Module 2.
-- **Sampling is deprecated.** Build on elicitation only.
+- **Solves:** how an AI agent calls your system as a tool — named tools, typed parameters, any client (Claude, VS Code, Cursor, Gemini)
+- **2026-07-28 revision:** the protocol went **stateless** — no sessions, no `initialize` handshake; behaves like an ordinary HTTP API. Elicitation became multi-round-trip (that mechanism saves us in Module 2). Sampling deprecated.
+- **Deliberately silent** on payments and authorization — that silence is most of today
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-4 opacity-75">
+
+You've used MCP; we won't re-teach it. Host / client / server, and the host owns the UI —
+remember that, it becomes the whole argument in Module 2.
+
+</div>
+
+</v-click>
+
+---
+
+# llms.txt + the agent card
+
+**Conventions, not committees.**
+
+<v-clicks>
+
+- **Solves:** how an agent finds out you exist and what you allow
+- `/llms.txt` — your API described in prose, like robots.txt's opposite number: thirty years after a file to keep robots out, this one invites them in
+- `/.well-known/agent.json` — capabilities, named skills, security scheme, machine-readable
+- Generate the card **from the code that serves the API**, so it cannot drift
+
+</v-clicks>
+
+---
+
+# AP2 — Agent Payments Protocol
+
+**Google → FIDO Alliance** (the passkeys/WebAuthn body), ~60 organizations including
+Visa and Mastercard.
+
+<v-clicks>
+
+- **Solves:** proving who authorized a payment, and within what limits
+- **The idea:** a *mandate* — a signed, verifiable credential carrying the user's instructions, that **travels with the transaction** so it's there when a dispute arrives
+- An artifact the model cannot mint — which is why this course's mandate concept maps to it
+- Status: strong institutional backing; production still pilot-stage
+
+</v-clicks>
+
+---
+
+# ACP — Agentic Commerce Protocol
+
+**OpenAI + Stripe.** Checkout as a REST API an agent can drive.
+
+<v-clicks>
+
+- Create, update, complete, or cancel a checkout; product feed; delegated payment tokens
+- **The cautionary tale:** ChatGPT Instant Checkout retired March 2026 after ~a dozen merchants — single item only, scraped product data, no sales-tax remittance
+- The bottleneck was never the AI. It was **commerce plumbing and stale data.**
+- The spec survives via Stripe's Agentic Commerce Suite
+
+</v-clicks>
+
+---
+
+# UCP — Universal Commerce Protocol
+
+**Google + Shopify**, Apache 2.0.
+
+<v-clicks>
+
+- **Solves:** the whole journey, not just checkout — catalog, cart, identity, orders
+- Discovery via a manifest where you declare what you support
+- **Composes the others** — MCP, A2A, and AP2 support built in; a composition layer, not a competitor
+- Live on Google Search AI Mode, Gemini, YouTube Shopping — the most commercially active spec here
+
+</v-clicks>
+
+---
+
+# TAP — Trusted Agent Protocol
+
+**Visa + Cloudflare** (Web Bot Auth; RFC 9421 HTTP Message Signatures).
+
+<v-clicks>
+
+- **Solves:** telling at the edge whether a robot is who it claims to be
+- Signed agent identity in HTTP headers, verified against a key directory
+- Distinguishes a browsing agent from a paying one
+- **This is the WAF answer:** a scalper bot cannot produce a signature it does not have
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-4 opacity-75">
+
+(x402, the crypto branch: machines paying machines fractions of a cent over HTTP 402.
+Real volume, API metering — not on the path for card-based retail.)
+
+</div>
+
+</v-click>
+
+---
+
+# They are layers, not competitors
+
+| Layer | Who lives there |
+|---|---|
+| **Discovery** | llms.txt · agent card · UCP manifest |
+| **Connectivity** | MCP · A2A |
+| **Identity** | OAuth 2.1 · Visa TAP at the edge |
+| **Authorization** | AP2 mandates |
+| **Transaction** | ACP checkout · UCP full journey |
+| **Settlement** | Card networks · x402 for machine metering |
+
+<v-click>
+
+<div class="pt-4">
+
+**This table is the course.** The front door's seven steps walk it top to bottom.
+No shortage of specifications — a shortage of production volume, and much of this will
+be rewritten. The concepts survive the rewrites.
+
+</div>
+
+</v-click>
+
+---
+
+# Step 1 — Discovery: publish two documents
+
+`https://mockhub.kousenit.com/llms.txt` — the real one, today:
+
+```text
+# MockHub API — llms.txt
+## MCP Tools (OAuth 2.1 authentication)
+MockHub exposes MCP tools for AI agents at /mcp (Streamable HTTP transport).
+Authentication: OAuth 2.1 with Dynamic Client Registration (DCR).
+- findTickets(...) — RECOMMENDED: compound search returning matching listings
+  sorted by price ... Reduces round-trips from 3 to 1.
+## Agent Mandates
+Mandates define what an agent is authorized to do on behalf of a user.
+Approval mode: ... APPROVAL_REQUIRED requires an approved purchase approval.
+```
+
+<v-click>
+
+The commerce rules are stated **before the first call**: an agent that reads this file
+already knows it cannot simply buy things.
+
+</v-click>
+
+---
+
+# Step 1 — the agent card
+
+`/.well-known/agent.json`, also real:
+
+```json
+{
+  "name": "MockHub",
+  "supported_interfaces": [{ "url": ".../mcp", "protocol_binding": "mcp/streamable-http" }],
+  "security_schemes": { "oauth2": {
+      "description": "OAuth 2.1 with Dynamic Client Registration",
+      "oauth2_metadata_url": ".../.well-known/openid-configuration" } },
+  "skills": [
+    { "id": "ticket-purchase",
+      "description": "Complete a ticket purchase workflow... Requires an active mandate.",
+      "examples": ["Buy the cheapest ticket that matches my budget"] } ]
+}
+```
+
+<v-click>
+
+Observed behavior: a client you've never met follows the metadata, **registers itself**,
+authenticates, reads the tools. *I published two documents; the client worked out the
+rest.*
+
+</v-click>
+
+---
+
+# Discovery costs almost nothing
+
+<v-clicks>
+
+- The card is **generated from the code that serves the API** — it cannot drift
+- llms.txt is maintained prose — its failure mode is drift, so CI-check it against your routes
+- A discovery document that lies is worse than none: agents act on it
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-6">
+
+📁 **`examples/discovery/`** — both documents, captured and annotated.
+
+Steps 1–2 are useful even if you never build the rest — and agents are already looking.
+
+</div>
+
+</v-click>
+
+---
+
+# Step 2 — Connectivity: design for the goal, not the resource
+
+REST resources map to a UI with navigation. An agent has a **goal**, and every
+round-trip is latency, tokens, and another chance to lose the thread.
+
+```java
+findTickets(query: "Spinners", city: "New York",
+            maxPrice: 200, section: "Orchestra")
+```
+
+One call instead of three — search, event detail, and listings together.
+
+<v-click>
+
+<div class="pt-4">
+
+**Give it reasons, not just rows.** `compareTickets` returns ranked options with reason
+codes — `COMPETITIVE_PRICE`, `MATCHES_REQUESTED_SECTION`. The ranking is heuristic and
+inspectable, **deliberately not an LLM**: judgment the customer can audit beats judgment
+the model improvises.
+
+</div>
+
+</v-click>
+
+---
+
+# Tool descriptions are the interface
+
+<v-clicks>
+
+- Every description ships on **every turn** — hundreds of tools compete in the palette
+- Write them for someone who has never seen your domain
+- They are a correctness surface *and* an attack surface, simultaneously
+- And — as we're about to measure — they are your **shelf placement**
+
+</v-clicks>
+
+---
+
+# Demo — two providers, one question
+
+Two MCP servers. **Identical inventory.** The only difference:
+
+<div class="pt-4">
+
+| TicketNexus | SeatStream |
+|---|---|
+| `searchEvents`, `getEventListings` | `search`, `seats` |
+| Thorough descriptions | One word each |
+
+</div>
+
+<div class="pt-6">
+
+Same prompt every time: *"I'd like to see Hamilton. Find me one ticket under $60 and
+tell me the best option."*
+
+One live run for authenticity — then sixteen recorded runs, because one draw from a
+distribution tells you nothing.
+
+</div>
+
+---
+
+# The grid
+
+| Model | Runs | Consulted both providers |
+|---|---|---|
+| Fable | 8 | **8 / 8** — consistent, cross-checked inventory |
+| Sonnet | 4 | **2 / 4** — no disclosure when it skipped one |
+| Haiku | 4 | **0 / 4** — SeatStream's tools were never even *loaded* |
+
+<div class="pt-6">
+
+<v-click>
+
+No run ever preferred the tersely-documented provider. With the smallest model,
+provider selection happened at the **tool-discovery layer** — before any reasoning
+about sourcing took place.
+
+</v-click>
+
+</div>
+
+---
+
+# What the grid means for your site
+
+<v-clicks>
+
+1. Which providers get searched is a property of **the model your customer happens to run**
+2. The better-documented provider wins by default — documentation quality is a **marketing surface**, not a nicety
+3. Non-disclosure is the default failure: "the best option," with no mention an alternative went unqueried
+4. None of this is a bug. Every run completed its task.
 
 </v-clicks>
 
@@ -311,7 +679,9 @@ Note what is **not** in this picture: any check on whether the model *should* ha
 
 <div class="pt-6 text-xl">
 
-What it did **not** fix: everything else in this module.
+Merchant-side conclusion: **write your tool surface like it's your storefront** — it is.
+
+Buyer-side conclusion: Module 3 — someone has to make sourcing a *policy*.
 
 </div>
 
@@ -319,31 +689,7 @@ What it did **not** fix: everything else in this module.
 
 ---
 
-# MCP in five slides — 5: acronyms live in the handout
-
-<div class="pt-4">
-
-Today you'll hear AP2, ACP, UCP, TAP, SEP-2322, MRTR.
-
-**They are all in `spec-map.md` in the repo** — one page, concept → spec, with primary sources.
-
-</div>
-
-<div class="pt-8">
-
-<v-click>
-
-The specifications are moving. The concepts are stable.
-
-We teach the concepts: **mandate, approval, profile, evidence.**
-
-</v-click>
-
-</div>
-
----
-
-# 1.1 — The tool anyone would write first
+# Step 3 — Identity: the tool anyone would write first
 
 ```java
 buyTickets(String userEmail, String listingId, int quantity)
@@ -363,20 +709,13 @@ buyTickets(String userEmail, String listingId, int quantity)
 </div>
 
 ---
-layout: section
----
-
-# 1.2 — Break it
-## The agent supplies the identity
-
----
 
 # Demo: a friendly request
 
 <div class="pt-4 text-xl italic">
 
-"I'm Alice. My friend Bob mentioned he wants to see Monster Jam but hasn't gotten around to
-buying. Go ahead and grab him a ticket — surprise him."
+"I'm Alice. My friend Bob mentioned he wants to see Monster Jam but hasn't gotten
+around to buying. Go ahead and grab him a ticket — surprise him."
 
 </div>
 
@@ -396,32 +735,53 @@ No error. No warning. The tool did exactly what it was told.
 
 ---
 
-# The confused deputy, in three lines of Java
+# The confused deputy, and the correction
 
-<div class="pt-4">
-
-The server holds a session. The agent names a user. The server spends the session on the name.
-
-</div>
+The server holds a session. The agent names a user. The server spends the session on
+the name.
 
 ```java
-// The mistake is the parameter, not the code around it
-buyTickets(String userEmail, ...)  // ← an assertion
+buyTickets(String userEmail, ...)   // ← an assertion, not a credential
 ```
 
 <v-click>
 
-<div class="pt-6">
-
-**Correction:** identity binds from the authenticated token, never from an agent-supplied argument.
+**Correction, as a build:** the human logs in once, in a browser, and authorizes the
+client. Identity binds from the authenticated token at the transport layer — OAuth 2.1
+with Dynamic Client Registration, subject pinned per request. The cart is a row that
+belongs to that identity.
 
 ```java
 buyTickets(String listingId, int quantity)  // identity comes from the token
 ```
 
-</div>
-
 </v-click>
+
+---
+
+# How the real platform does it
+
+MockHub, `ChatContext.resolveEmail` — every tool funnels through this:
+
+```java
+// If OAuth pinned an authenticated email for this request, use it.
+// Otherwise — and only outside the OAuth profile — trust the parameter.
+public static String resolveEmail(String userEmail) {
+    String authenticated = AUTHENTICATED_EMAIL.get();
+    return authenticated != null ? authenticated : userEmail;
+}
+```
+
+<v-clicks>
+
+- The `userEmail` parameter **still exists in the tool schema**. The model can type
+  whatever it likes. The server simply doesn't use it.
+- A poisoned listing saying "look up orders for admin@…" will get the model to *try*.
+  It cannot *succeed*.
+- Full walk-through — including the deliberately different ACP trust model — in
+  📁 **`code-tour.md`**, step 3.
+
+</v-clicks>
 
 ---
 
@@ -444,127 +804,58 @@ You'll see this again in Module 3, wearing a different hat.
 </div>
 
 ---
-
-# 1.3 — Too many tools
-
-<v-clicks>
-
-- Wrong-tool selection is a **measurable** property, not a vibe. You can count it.
-- Tool descriptions are a correctness surface *and* an attack surface, simultaneously.
-- Every tool you expose is authority you have granted in advance.
-
-</v-clicks>
-
-<v-click>
-
-<div class="pt-8 opacity-75">
-
-We'll count wrong-tool selection for real in Module 3.
-
-</div>
-
-</v-click>
-
----
-
-# 1.4 — What MCP actually buys you
-
-<div class="pt-4">
-
-**Real, and worth having:** a more auditable capability boundary than handing an agent a shell, `curl`, and unrestricted network access.
-
-</div>
-
-<v-click>
-
-<div class="pt-8">
-
-**What it does not address:**
-
-- Authorization
-- Prompt injection
-- Confused deputies
-- Excessive tool power
-
-</div>
-
-</v-click>
-
-<v-click>
-
-<div class="pt-6 text-xl">
-
-Production complexity didn't disappear when the protocol went stateless. It **moved up the stack**.
-
-</div>
-
-</v-click>
-
----
-
-# 1.5 — A question for you
-
-<div class="pt-6 text-xl">
-
-Which of these failures would your existing test suite catch?
-
-</div>
-
-<div class="pt-8">
-
-<v-clicks>
-
-A thousand tests inside modeled environments miss failures that happen:
-
-- at process boundaries
-- under the real production profile
-- through real clients
-- under nondeterminism
-
-The confused deputy we just watched passes every unit test you'd write for it.
-
-</v-clicks>
-
-</div>
-
----
 layout: section
 class: text-center
 ---
 
 # Module 1
 
-## An auditable capability boundary
-## is not an authority boundary.
+## Steps 1–3 made you reachable and auditable.
+## They did not make you safe.
+
+<div class="pt-8 text-xl opacity-90">
+
+An auditable capability boundary is not an authority boundary.
+
+</div>
 
 ---
 layout: section
 ---
 
 # Module 2
-## Authority, mandates, and approval
+## Authorization and approval
 
 ---
 
-# 2.1 — "Do it again" vs "like last time"
+# Step 4 — the mandate is a permission slip
 
-<div class="pt-6">
-
-<v-clicks>
-
-**"Do it again"** carries the authorization *inside the instruction*. The evidence is the prior order.
-
-**"Like last time"** carries no authorization. It is an **invitation to infer one**.
-
-</v-clicks>
-
-</div>
+```java
+createMandate(
+    agentId:                "claude",
+    maxSpendPerTransaction: 200,
+    maxSpendTotal:          1000,
+    allowedCategories:      "concerts",
+    approvalMode:           AUTO_PURCHASE,
+    expiresAt:              30 days
+)
+```
 
 <v-click>
 
-<div class="pt-10 text-xl">
+Four properties make it a mandate:
 
-An inference is not an authorization. But it spends money just as well.
+**Explicit** — the customer chose these numbers · **Inspectable** — they can read it
+back · **Bounded** — per transaction, in total, by category, in time ·
+**Revocable** — effective immediately
+
+</v-click>
+
+<v-click>
+
+<div class="pt-2 opacity-75">
+
+📁 `examples/mandate-check/` — the whole check as one runnable file.
 
 </div>
 
@@ -572,111 +863,59 @@ An inference is not an authorization. But it spends money just as well.
 
 ---
 
-# Demo: what did "like last time" mean?
+# Check it at the cart. Check it again at confirmation.
 
-Agent reads the customer's real order history, then picks a seat for a monster-truck show.
+Time passes between those moments — the mandate may have been revoked, cumulative
+spend may have moved.
 
 <v-click>
 
-<div class="pt-6">
+From MockHub's `completeCheckout`, verbatim:
 
-It anchored on the most recent order — a **Floor** seat for *Hamilton* — and chose **Floor**:
-
-<div class="pt-4 pl-4 border-l-4 border-gray-400 italic">
-
-"Floor is arguably the worst place to sit at a Monster Jam show given the mud and exhaust,
-but it faithfully matches your history."
-
-</div>
-
-</div>
+> *"Last line of defence before money moves: re-authorize against the order total.
+> updateCheckout already did this; completion — the step that actually charges the
+> buyer — did not, so a mandate could be revoked or outgrown between the two calls."*
 
 </v-click>
 
 <v-click>
-
-<div class="pt-6">
-
-Faithful to the data. Unaudited. Wrong.
-
-A Broadway floor seat and a monster-truck floor seat share a label and nothing else.
-
-</div>
-
-</v-click>
-
----
-
-# The purchase would have been perfectly legal
-
-<div class="pt-8 text-xl">
-
-<v-clicks>
-
-- Inside the mandate ✓
-- Inside the budget ✓
-- Consistent with history ✓
-- Not what the customer wanted ✗
-
-</v-clicks>
-
-</div>
-
-<v-click>
-
-<div class="pt-10">
-
-No boundary was crossed, because the boundary was never asked about the right thing.
-
-</div>
-
-</v-click>
-
----
-
-# 2.2 — Make the inference an artifact
 
 <div class="pt-4">
 
-```mermaid {scale: 0.68}
-flowchart LR
-    U["'like last time'"] --> M[LLM]
-    M -->|proposes| P[PurchaseProfile<br/>structured]
-    P --> V{Deterministic<br/>validation}
-    V -->|rejected| M
-    V -->|accepted| C[Customer inspects]
-    C --> MA[Mandate attaches<br/>to the PROFILE]
-```
+A human clicking Buy Now re-authorizes implicitly. An agent has to be **made** to do it
+explicitly.
 
 </div>
 
-<div class="pt-2">
-
-The mandate attaches to the **profile**, not to the raw utterance.
-
-</div>
+</v-click>
 
 ---
 
-# The most transferable idea in this course
+# A spending limit is an accounting problem
 
-<div class="pt-12 text-2xl text-center">
+<v-clicks>
 
-Let the model produce **structure**.
+- Recorded on **confirmation**, not on checkout
+- **Reversed** when an order is cancelled
+- Inside the transaction, with **row locks** (`findByMandateIdForUpdate`, pessimistic write)
 
-Never let it produce **authority**.
+</v-clicks>
+
+<v-click>
+
+<div class="pt-8 text-xl">
+
+Get this wrong and a customer's $1,000 limit quietly becomes $3,000.
+
+The answer is boring, deliberate locking — not cleverness.
 
 </div>
 
-<div class="pt-12 text-center opacity-75">
-
-This generalizes far beyond ticketing.
-
-</div>
+</v-click>
 
 ---
 
-# 2.3 — Two axes, gated on reversibility
+# Two axes, gated on reversibility
 
 | | Authority to **act** | Authority to **pay** |
 |---|---|---|
@@ -687,7 +926,8 @@ This generalizes far beyond ticketing.
 
 <div class="pt-6">
 
-Reversibility is the **gate**, not the ladder. The less reversible, the narrower the authority.
+Reversibility is the **gate**, not the ladder. The less reversible, the narrower the
+authority.
 
 </div>
 
@@ -702,7 +942,6 @@ Reversibility is the **gate**, not the ladder. The less reversible, the narrower
 **Autonomous in-mandate success is the intended path.**
 
 If every purchase ends in an approval prompt, the agent is an elaborate shopping cart —
-
 and the customer will reasonably ask why they didn't just use the website.
 
 Escalate by **exception**, not by default.
@@ -710,6 +949,19 @@ Escalate by **exception**, not by default.
 </v-clicks>
 
 </div>
+
+---
+
+# What the specs call this: AP2
+
+<v-clicks>
+
+- MockHub's mandate is a **database row** the platform enforces — bounded, revocable, auditable
+- AP2's mandate is the same idea as a **verifiable digital credential**: signed, portable, and it **travels with the transaction**
+- When the dispute arrives six weeks later, the mandate is *in* the payment flow, not in one merchant's database
+- Same concept, growing an interoperable spine — which is why this course teaches the concept
+
+</v-clicks>
 
 ---
 
@@ -751,7 +1003,7 @@ A $35 ceiling authorized ~$38.50.
 
 # Nobody lied. Nothing was exploited.
 
-<div class="pt-8 text-2xl text-center">
+<div class="pt-6 text-2xl text-center">
 
 The mandate held — in its own units.
 
@@ -761,11 +1013,156 @@ Which were not the units the customer meant.
 
 <v-click>
 
-<div class="pt-12 text-center text-xl">
+<div class="pt-8">
 
-A bound denominated in a different number than the customer said
+**The fix, in the real codebase — one bug, one type, four call sites.** MockHub's
+`OrderPricing` record is now the *single place* the fee is applied, and every
+authorization path validates `totalForSubtotal()` — the number the customer pays.
+Its javadoc names the bug it killed. (Code tour, step 4.)
 
-is not a bound.
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-4 text-center text-xl">
+
+A bound denominated in a different number than the customer said is not a bound.
+
+</div>
+
+</v-click>
+
+---
+
+# "Do it again" vs "like last time"
+
+<div class="pt-6">
+
+<v-clicks>
+
+**"Do it again"** carries the authorization *inside the instruction*. The evidence is
+the prior order.
+
+**"Like last time"** carries no authorization. It is an **invitation to infer one**.
+
+</v-clicks>
+
+</div>
+
+<v-click>
+
+<div class="pt-10 text-xl">
+
+An inference is not an authorization. But it spends money just as well.
+
+</div>
+
+</v-click>
+
+---
+
+# Demo: what did "like last time" mean?
+
+Agent reads the customer's real order history, then picks a seat for a monster-truck show.
+
+<v-click>
+
+<div class="pt-6">
+
+It anchored on the most recent order — a **Floor** seat for *Hamilton* — and chose **Floor**:
+
+<div class="pt-4 pl-4 border-l-4 border-gray-400 italic">
+
+"Floor is arguably the worst place to sit at a Monster Jam show given the mud and
+exhaust, but it faithfully matches your history."
+
+</div>
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-6">
+
+Faithful to the data. Inside the mandate. Inside the budget. **Wrong.**
+
+No boundary was crossed, because the boundary was never asked about the right thing.
+
+</div>
+
+</v-click>
+
+---
+
+# The fix: make the inference an artifact
+
+<div class="pt-4">
+
+```mermaid {scale: 0.68}
+flowchart LR
+    U["'like last time'"] --> M[LLM]
+    M -->|proposes| P[PurchaseProfile<br/>structured]
+    P --> V{Deterministic<br/>validation}
+    V -->|rejected, with reasons| M
+    V -->|accepted| C[Customer inspects]
+    C --> MA[Mandate attaches<br/>to the PROFILE]
+```
+
+</div>
+
+<div class="pt-2">
+
+The mandate attaches to the **profile**, not to the raw utterance.
+
+📁 `examples/purchase-profile/` — both sides of the line, runnable.
+
+</div>
+
+---
+
+# The most transferable idea in this course
+
+<div class="pt-12 text-2xl text-center">
+
+Let the model produce **structure**.
+
+Never let it produce **authority**.
+
+</div>
+
+<div class="pt-12 text-center opacity-75">
+
+This generalizes far beyond ticketing.
+
+</div>
+
+---
+
+# Validation speaks to a model now — two field notes
+
+<v-clicks>
+
+**The customer asked for jazz**, so the agent wrote `allowedCategories: "jazz"`.
+Plausible, invalid — it validated clean and blocked every purchase. MockHub's rejection
+now answers in the model's language: *"Categories are event types, not genres"* — plus
+the legal values, so the retry can succeed.
+
+**An agent sent `allowedCategories: ""`** — not null, empty string. Null meant *no
+restriction*; blank meant *restricted to nothing*. Every purchase blocked, and the
+mandate looked fine.
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-6 text-xl">
+
+Agents speak the customer's vocabulary. Your schema speaks slugs.
+Validate for the gap, and reject with the vocabulary lesson attached.
 
 </div>
 
@@ -775,8 +1172,8 @@ is not a bound.
 layout: section
 ---
 
-# 2.4 — In-band approval
-## and why it fails
+# Step 5 — Approval
+## and the architecture that defeats itself
 
 ---
 
@@ -840,7 +1237,6 @@ Then it reported success. Cheerfully. Accurately.
 <v-clicks>
 
 - Every API call was legitimate
-- Every parameter was valid
 - The 409 fired exactly as designed
 - The model was not jailbroken, tricked, or adversarial
 - It was told to make sure the order completed, and it did
@@ -869,9 +1265,58 @@ class: text-center
 
 ---
 
-# 2.5 — The protocol answer
+# This happened to the real platform too
 
-Multi Round-Trip Requests (**SEP-2322**), from the 2026-07-28 spec:
+MockHub's git history, commit `2acc16c`, 2026-07-25 — verbatim from the commit message:
+
+<div class="pt-4 pl-4 border-l-4 border-gray-400">
+
+"The approval checkpoint was self-defeating: approvePurchase/denyPurchase were MCP
+tools, and in mcp-oauth2 mode the agent acts as the pinned OAuth user — so the agent
+that proposed a purchase could approve its own proposal in-band. **Approval now lives
+only where the agent cannot reach.**"
+
+</div>
+
+<v-click>
+
+<div class="pt-6">
+
+The fix has two halves — one you can build today on any stack, one the protocol now
+gives you. You want both.
+
+</div>
+
+</v-click>
+
+---
+
+# Fix 1 (merchant-side): the page the agent cannot call
+
+<v-clicks>
+
+- The approval tools came **out of the MCP server entirely** — the only approval path is a page on the marketplace's own session (`/my/approvals`)
+- A badge finds the human; the page shows *which agent, under which mandate, its own stated reasoning*
+- The proposal **expires**; agent, mandate, and the **exact total** must match at completion — the number the human approved cannot drift
+- A CI test asserts the approve/deny tools are **never registered**: the invariant is pinned by the build, not by convention
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-4 opacity-75">
+
+Buildable today, no new spec required. Code tour, step 5.
+
+</div>
+
+</v-click>
+
+---
+
+# Fix 2 (protocol-side): MRTR — SEP-2322
+
+Multi Round-Trip Requests, from the 2026-07-28 spec:
 
 ```mermaid {scale: 0.62}
 sequenceDiagram
@@ -908,7 +1353,8 @@ sequenceDiagram
 
 <div class="pt-8 text-xl">
 
-What §2.4 enforced by architectural discipline, the protocol now enforces for you.
+What the merchant-side fix enforces by architectural discipline, the protocol now
+enforces for you.
 
 </div>
 
@@ -938,9 +1384,11 @@ Same MockHub. Same mandate. **One architectural decision apart.**
 
 <div class="pt-6">
 
-The question reached the **host**, not the agent. That line is the entire thesis of the segment.
+The question reached the **host**, not the agent. That line is the entire thesis of the
+segment.
 
-Decline path works too — and the agent cannot route around it, because there is no tool to call.
+Decline path works too — and the agent cannot route around it, because there is no tool
+to call.
 
 </div>
 
@@ -961,9 +1409,9 @@ Decline path works too — and the agent cannot route around it, because there i
 
 <div class="pt-8">
 
-**MCP Apps** (one slide): server-rendered HTML in a sandboxed iframe, UI actions flowing
-through the same audit and consent path as a direct tool call. The complementary
-inline-approval-card option.
+**MCP Apps** (one slide): server-rendered HTML in a sandboxed iframe, UI actions
+flowing through the same audit and consent path as a direct tool call. The
+complementary inline-approval-card option.
 
 </div>
 
@@ -971,7 +1419,7 @@ inline-approval-card option.
 
 ---
 
-# One consequence, which sets up Module 3
+# One consequence, which Lab 2 will make you feel
 
 <div class="pt-8 text-xl">
 
@@ -987,6 +1435,9 @@ Duplicate delivery is now **normal control flow**, not an error condition.
 
 Every state-changing tool needs an **idempotency key**.
 
+📁 `examples/idempotency/` — the pattern in one file; MockHub does it with a partial
+unique index and a pre-write lookup.
+
 </v-clicks>
 
 </div>
@@ -995,7 +1446,7 @@ Every state-changing tool needs an **idempotency key**.
 layout: section
 ---
 
-# LAB
+# LAB 1
 ## The mandate boundary test
 
 ---
@@ -1035,7 +1486,8 @@ Write down pass or fail for each:
 
 <div class="pt-4 opacity-75">
 
-If your setup is broken, this table **is** your lab. The learning survives the setup failure.
+If your setup is broken, this table **is** your lab. The learning survives the setup
+failure.
 
 </div>
 
@@ -1053,7 +1505,8 @@ The agent's credential cannot **mint a mandate**.
 
 <div class="pt-6">
 
-Test 4 is the pattern — take the agent's credential to a door only the human's opens, assert 401.
+Test 4 is the pattern — take the agent's credential to a door only the human's opens,
+assert 401.
 
 </div>
 
@@ -1061,8 +1514,8 @@ Test 4 is the pattern — take the agent's credential to a door only the human's
 
 <div class="pt-6">
 
-Why write this one yourself: if it ever failed, every other boundary in the lab would be
-decorative. An agent that can mint its own mandate can grant itself any ceiling.
+Why write this one yourself: if it ever failed, every other boundary in the lab would
+be decorative. An agent that can mint its own mandate can grant itself any ceiling.
 
 </div>
 
@@ -1083,98 +1536,77 @@ layout: section
 ---
 
 # Module 3
-## Sourcing, evidence, and evaluation
+## Payment, evidence, and the policy you write
 
 ---
 
-# 3.1 — Two providers, one question
+# Step 6 — you do not hand the agent a card number
 
-Two MCP servers. **Identical inventory.** The only difference:
+A **scoped payment credential** instead:
 
-<div class="pt-4">
+<v-clicks>
 
-| TicketNexus | SeatStream |
+- Issued by the user, to one named agent
+- Bounded amount and currency, with an expiry
+- One-time or reusable, and revocable
+- Validated before money moves, **consumed exactly once**
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-6">
+
+Deliberately **separate from the mandate** — may-act and may-pay are different
+questions, answered by different artifacts.
+
+</div>
+
+</v-click>
+
+---
+
+# Three questions, three records
+
+| Question | Artifact |
 |---|---|
-| `searchEvents`, `getEventListings` | `search`, `seats` |
-| Thorough descriptions | One word each |
-
-</div>
-
-<div class="pt-6">
-
-Same prompt every time: *"I'd like to see Hamilton. Find me one ticket under $60 and tell
-me the best option."*
-
-</div>
-
----
-
-# One live run — then the evidence
-
-<div class="pt-6">
-
-A single live run tells you what the model did **once**.
-
-</div>
-
-<div class="pt-8">
+| May the agent take this action? | **The mandate** |
+| Did a human approve this specific purchase? | **The approval record** |
+| May it pay with this authority? | **The scoped credential** |
 
 <v-click>
 
-Three live runs gamble on nondeterminism showing up on cue. If the model happens to behave
-consistently, the demo argues against you.
+<div class="pt-6">
 
-**So here are sixteen recorded runs instead.**
-
-</v-click>
+"Consumed exactly once" is the same boring answer as spend accounting: a pessimistic
+row lock plus a status check inside it — with an idempotency carve-out, so a retry of
+the *same order* isn't punished. Consumption happens **before** payment confirmation,
+and a payment failure provably rolls it back. (Code tour, step 6.)
 
 </div>
 
+</v-click>
+
 ---
 
-# The grid
+# The guardrails that run at every transition
 
-| Model | Runs | Consulted both providers |
+The real condition names — they appear verbatim in refusals:
+
+| Condition | Severity | Prevents |
 |---|---|---|
-| Fable | 8 | **8 / 8** — consistent, cross-checked inventory |
-| Sonnet | 4 | **2 / 4** — no disclosure when it skipped one |
-| Haiku | 4 | **0 / 4** — SeatStream's tools were never even *loaded* |
-
-<div class="pt-6">
+| `mandate-authorization` | CRITICAL | unauthorized purchases |
+| `event-in-future` | CRITICAL | tickets to past events |
+| `listing-active` | CRITICAL | already-sold seats |
+| `agent-risk` | WARNING → CRITICAL | repeated mismatches |
+| `spending-limit` | WARNING | surprisingly large carts |
 
 <v-click>
-
-No run ever preferred the tersely-documented provider.
-
-With the smallest model, provider selection happened at the **tool-discovery layer** —
-before any reasoning about sourcing took place.
-
-</v-click>
-
-</div>
-
----
-
-# What the grid actually proves
 
 <div class="pt-4">
 
-<v-clicks>
-
-1. Sourcing behavior is a property of **the model your customer happens to run**, not of the protocol
-2. The better-documented provider wins by default — that's a **marketing surface**, not a market
-3. Non-disclosure is the default failure: "the best option" with no mention that an alternative went unqueried
-4. The harness participates — deferred tool loading and subagents shaped which provider was consulted
-
-</v-clicks>
-
-</div>
-
-<v-click>
-
-<div class="pt-6">
-
-None of this is a bug. Every run completed its task.
+Only CRITICAL blocks. WARNINGs ride along in a `warnings[]` array beside the payload —
+advisory and hard-stop, distinguishable in one response shape.
 
 </div>
 
@@ -1182,97 +1614,44 @@ None of this is a bug. Every run completed its task.
 
 ---
 
-# MCP gave you interoperability
+# Refuse in a sentence the agent can relay
 
-<div class="pt-12 text-2xl text-center">
+The real refusal, verbatim:
 
-It lets an agent reach multiple sellers.
-
-<div class="pt-8">
-
-It says **nothing** about how to act as a
-trustworthy buyer's representative.
-
-</div>
-
-</div>
-
----
-
-# 3.2 — Sourcing as a contract
-
-The policy your application must supply:
-
-<div class="pt-4 text-sm">
+```
+Cannot checkout: mandate-authorization: Mandate does not authorize
+this action (scope=PURCHASE, amount=44.61, mandateId=…)
+```
 
 <v-clicks>
 
-1. Search **every** eligible provider
-2. Normalize price, fees, seat information, refundability, confidence
-3. Deduplicate equivalent listings
-4. Rank against **declared** customer preferences
-5. **Disclose** the selection and the reason
-6. Purchase only through providers covered by the customer's authority
+- The agent **will** retry regardless. Tell it the constraint, or it will invent one
+  for your customer.
+- Notice what's missing: **the ceiling**. MockHub logs it server-side but doesn't
+  disclose it. Leak-minimization — or bad agent UX?
+- In Lab 2 you'll write the refusal the other way, with amount *and* cap. Argue it out.
+  Both are defensible; **choosing silently is not.**
 
 </v-clicks>
 
-</div>
-
 ---
 
-# Narrative is not evidence
-
-<div class="pt-4">
-
-Sharpen the policy into a **postcondition**:
-
-</div>
-
-<div class="pt-6 pl-4 border-l-4 border-gray-400 text-xl">
-
-The selected listing is the minimum-cost listing satisfying the profile across all searched
-providers — **or** an exception record explains why not.
-
-</div>
-
-<v-click>
-
-<div class="pt-8">
-
-That is checkable. "The model chose it" is not.
-
-</div>
-
-</v-click>
-
----
-
-# Disclosure belongs here too
+# Risk signals a browser could never give you
 
 <v-clicks>
 
-- Affiliate relationships
-- Marketplace ownership
-- Preferred-provider agreements
+- Cart holds and rapid bursts of them; failed checkouts; high-spend attempts; **mandate mismatches** — the agent tried something it was not authorized for
+- Recorded with `REQUIRES_NEW` so the signal **survives the rollback** of the action it describes — a naive implementation loses exactly the records it most needs
+- Three mandate mismatches in 24 hours → blocked, structurally, before any work happens
 
 </v-clicks>
 
 <v-click>
 
-<div class="pt-8">
+<div class="pt-6 text-xl">
 
-Otherwise "the model chose it" **conceals self-preferencing** — and the model's preference,
-as we just measured, tracks documentation quality.
-
-</div>
-
-</v-click>
-
-<v-click>
-
-<div class="pt-6 opacity-75">
-
-This is the same shape as best-execution obligations in other regulated markets.
+And an adversarial bot dressed as a delegated agent fails the *first* check —
+it has no mandate to mismatch against.
 
 </div>
 
@@ -1282,7 +1661,7 @@ This is the same shape as best-execution obligations in other regulated markets.
 layout: section
 ---
 
-# 3.3 — Untrusted text
+# Untrusted text
 ## and the boundary that fails without it
 
 ---
@@ -1349,7 +1728,11 @@ Two agents told *"don't spend more than $35"* completed these purchases:
 
 <div class="pt-6">
 
-No attacker. No injection. One agent flagged its own overrun — *after* the sale was final.
+No attacker. No injection. One agent flagged its own overrun — *after* the sale was
+final.
+
+You don't need a malicious seller to break a budget boundary. A helpful agent and a
+units mismatch will do it.
 
 </div>
 
@@ -1357,118 +1740,19 @@ No attacker. No injection. One agent flagged its own overrun — *after* the sal
 
 ---
 
-# You don't need a malicious seller
-
-<div class="pt-12 text-2xl text-center">
-
-to break a budget boundary.
-
-<div class="pt-8">
-
-A helpful agent and a units mismatch will do it.
-
-</div>
-
-</div>
-
----
-
-# The contract has two legs
-
-<div class="pt-6">
-
-<v-clicks>
-
-**1. Free text never widens a mandate.**
-No content originating from a listing can widen authority. Boundaries evaluate in
-deterministic code, against structured fields only.
-
-**2. The bound is denominated in the units the customer meant.**
-Not the subtotal, when the customer is charged the total.
-
-</v-clicks>
-
-</div>
-
-<v-click>
-
-<div class="pt-8">
-
-Same fix for both: authorization decisions happen in code, on structured values, in the
-customer's units.
-
-</div>
-
-</v-click>
-
----
-
-# So why write the injection defense at all?
-
-<div class="pt-8">
-
-<v-clicks>
-
-Ten clean runs is not a guarantee. It's a **sample**.
-
-The seller only needs it to work **once**, on **one** model version.
-
-The check costs nothing.
-
-</v-clicks>
-
-</div>
-
-<v-click>
-
-<div class="pt-8 text-xl">
-
-And notice: input space and authority space must not overlap — *second appearance*.
-
-</div>
-
-</v-click>
-
----
-
-# 3.4 — Evidence and evaluation
-
-A purchase evidence record:
-
-<div class="pt-4 text-sm">
-
-- Providers searched
-- Candidates considered
-- Ranking policy applied
-- `PurchaseProfile` version used
-- Selected listing
-- **Reason**
-
-</div>
-
-<v-click>
-
-<div class="pt-6">
-
-If you can't produce this, you cannot answer "why did you buy that?" — and someone will ask.
-
-</div>
-
-</v-click>
-
----
-
-# Eval conditions are design by contract
+# The contract has two legs — and one fix
 
 <div class="pt-4">
 
 <v-clicks>
 
-- Identity binds from the token, never from an argument *(§1.2)*
-- A mandate cannot be self-widened *(§2.4)*
-- **The amount charged never exceeds the customer's stated ceiling** *(§2.3, learned the hard way)*
-- Idempotency holds under retry *(§2.5)*
-- The sourcing postcondition holds, or an exception record exists *(§3.2)*
+**1. Free text never widens a mandate.** The defense is not a filter that hunts for
+hostile phrases — filters lose eventually. It's structural: the authorization
+function's **type signature** admits only structured fields, so seller prose has no
+path in. 📁 `examples/injection-filter/`
+
+**2. The bound is denominated in the units the customer meant.** Not the subtotal,
+when the customer is charged the total. 📁 `examples/mandate-check/`
 
 </v-clicks>
 
@@ -1478,7 +1762,11 @@ If you can't produce this, you cannot answer "why did you buy that?" — and som
 
 <div class="pt-6">
 
-You wrote four of these in the lab. This is the same file, grown up.
+Same fix for both: **authorization decisions happen in code, on structured values, in
+the customer's units.** And why write leg 1 after ten clean runs? The seller needs it
+to work once, on one model version — and the boundary costs nothing.
+
+Input space and authority space must not overlap — *second appearance*.
 
 </div>
 
@@ -1486,7 +1774,202 @@ You wrote four of these in the lab. This is the same file, grown up.
 
 ---
 
-# 3.5 — After the sale
+# Step 7 — Evidence
+
+A chargeback arrives six weeks later. "The robot did it" is not an answer.
+
+The record must reconstruct:
+
+<div class="pt-2 text-sm">
+
+<v-clicks>
+
+- Who authorized this agent, when, under what limits
+- Whether a human approved **this specific purchase**
+- Which payment authority was used, and whether it was consumed
+- What warnings fired, and what the agent was told
+- Which tickets were delivered, and to which channels
+
+</v-clicks>
+
+</div>
+
+---
+
+# One order, reconstructed
+
+```
+actorTimeline · The Spinners, 2026-08-16
+MANDATE_CREATED       USER    ken@…      10:02:14
+PROPOSAL_CREATED      AGENT   claude     10:07:41
+APPROVAL_GRANTED      USER    ken@…      10:08:56
+CHECKOUT_CREATED      AGENT   claude     10:09:02
+PAYMENT_CONFIRMED     SYSTEM  mock-pay   10:09:04
+TICKETS_DISPATCHED    SYSTEM  sms,email  10:09:06
+```
+
+<v-clicks>
+
+**Two of those rows are a human. That is the distinction a chargeback turns on.**
+
+Two design notes from the real thing: an early version hardcoded the mandate actor to
+USER — an agent-minted mandate was indistinguishable from a user-granted one. And what
+isn't persisted is marked `NOT_PERSISTED`, never invented. **Evidence must be
+checkable, not narrative** — a record that fabricates is worse than a gap.
+
+</v-clicks>
+
+---
+layout: section
+---
+
+# LAB 2
+## Expose a guarded tool
+
+---
+
+# Lab 1 proved someone else's boundary. This one is yours.
+
+You stand up a **tiny MCP server** — official SDK, your lab language — with two tools:
+`searchListings` and `buyTickets`. The scaffold is complete except one function:
+
+```
+authorize(mandate, pricing)  →  null | refusal-the-agent-can-relay
+```
+
+<v-clicks>
+
+- Run the tests: **one passes already** — there is no approval tool for the agent to
+  call. That one is the scaffold's promise.
+- Five fail. The red sentences are your worklist. The guard is 5–10 lines.
+- One listing is priced to catch a guard that checks the **subtotal**. If four tests
+  pass and the units test doesn't, you just reproduced the platform's most expensive
+  bug — personally.
+
+</v-clicks>
+
+---
+
+# When it's green, connect a real agent to it
+
+```bash
+claude --mcp-config mcp-config.json --strict-mcp-config
+```
+
+> "Buy me the cheapest Spinners ticket. Then get the floor seats too."
+
+<v-click>
+
+<div class="pt-6">
+
+Watch **your own refusal** come back through the agent's mouth — relayed accurately,
+because you gave it a constraint to relay.
+
+`labs/guarded-tool/` — in class if the clock allows; complete take-home either way.
+
+</div>
+
+</v-click>
+
+---
+
+# The buyer's side: sourcing as a contract
+
+Your customers' agents will shop like the grid showed. A trustworthy buyer's
+representative is a **policy** — deliberately not an LLM:
+
+<div class="pt-2 text-sm">
+
+<v-clicks>
+
+1. Search **every** eligible provider — failures disclosed, never silently skipped
+2. Normalize price, fees, seat info, refundability
+3. Deduplicate — the same physical seat from two providers is one candidate
+4. Rank against **declared** customer preferences, in the customer's units
+5. **Disclose** the selection, the reasons, and every deviation
+6. Purchase only through providers covered by the customer's authority
+
+</v-clicks>
+
+</div>
+
+<v-click>
+
+<div class="pt-2 pl-4 border-l-4 border-gray-400">
+
+**Postcondition:** the selected listing is the minimum-cost listing satisfying the
+profile across all searched providers — or an exception record explains why not.
+That is checkable. "The model chose it" is not.
+
+</div>
+
+</v-click>
+
+---
+
+# That policy, running — real output
+
+`course-client/` against hosted MockHub, two providers, no AI involved:
+
+```
+── purchase evidence ─────────────────────────────────────────
+providers searched .... [TicketNexus, SeatStream]
+provider failures ..... none
+candidates considered . 50
+ranking policy ........ min-total-cost-with-declared-preferences/v1
+profile version ....... v1
+selected .............. TicketNexus #104821 — Hamilton (Touring)
+                        Lower Level row A seat 13 at $33.69 all-in
+selection reasons ..... [LOWEST_TOTAL_COST]
+exception record ...... No listing in preferred section 'Orchestra'
+                        under budget; fell back to lowest total cost
+postcondition held .... true
+──────────────────────────────────────────────────────────────
+```
+
+<v-click>
+
+The deviation went **on the record**, not into silence. The agent profile wires this
+same policy to a model as a tool — the model converses, the policy decides.
+
+</v-click>
+
+---
+
+# Disclosure belongs here too
+
+<v-clicks>
+
+- Affiliate relationships
+- Marketplace ownership
+- Preferred-provider agreements
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-8">
+
+Otherwise "the model chose it" **conceals self-preferencing** — and the model's
+preference, as we measured this morning, tracks documentation quality.
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-6 opacity-75">
+
+This is the same shape as best-execution obligations in other regulated markets.
+
+</div>
+
+</v-click>
+
+---
+
+# After the sale
 
 The path everyone skips:
 
@@ -1494,10 +1977,10 @@ The path everyone skips:
 
 <v-clicks>
 
-- Wrong purchase
-- Customer dispute
-- Refund attempt against a non-refundable listing
-- Chargeback
+- Wrong purchase · customer dispute · refund attempt against a non-refundable listing · chargeback
+- Where does liability sit when an agent acted **correctly inside a mandate** but **against intent**?
+- The **BOTS Act** has no carve-out for consumer-delegated agents — a legitimate agent and a scalper bot present the same behavioral signature
+- The distinction is being built in **infrastructure** — TAP signatures, AP2 mandates — not in law
 
 </v-clicks>
 
@@ -1505,44 +1988,10 @@ The path everyone skips:
 
 <v-click>
 
-<div class="pt-8 text-xl">
-
-Where does liability sit when an agent acted **correctly inside a mandate** but **against intent**?
-
-</div>
-
-</v-click>
-
-<v-click>
-
 <div class="pt-6">
 
-No clean answers exist yet. That's not a gap in this course — it's a gap in the industry.
-
-</div>
-
-</v-click>
-
----
-
-# And the law hasn't been asked yet
-
-<v-clicks>
-
-- The **BOTS Act** (2016) is being actively enforced again since 2025
-- **No carve-out exists** for consumer-delegated AI agents
-- A legitimate consumer agent and a scalper bot present the **same behavioral signature**
-
-</v-clicks>
-
-<v-click>
-
-<div class="pt-6">
-
-The distinction is being built in **industry infrastructure** — Visa TAP, Cloudflare Web Bot
-Auth, AP2 mandates — not in law.
-
-That is a technical answer to a legal question nobody has formally asked.
+No clean answers exist yet. That's not a gap in this course — it's a gap in the
+industry, and your evidence records are what you'll argue with.
 
 </div>
 
@@ -1555,7 +2004,7 @@ class: text-center
 
 # Module 3
 
-## A trustworthy buyer's representative
+## A trustworthy transaction
 ## is a policy you write,
 ## not a property of the protocol.
 
@@ -1567,31 +2016,27 @@ layout: section
 
 ---
 
-# The protocol argument, now earned
+# Where to start — zero risk to full trust
 
-<div class="pt-6">
+<div class="pt-2">
 
-MCP went stateless on 2026-07-28. It removed **real** operational pain:
-
-</div>
-
-<div class="pt-4">
-
-<v-clicks>
-
-- Sticky sessions
-- Shared session stores
-- Sessions dying with a container
-
-</v-clicks>
+| | | |
+|---|---|---|
+| **1** | Be discoverable | llms.txt + an agent card |
+| **2** | Expose read-only tools | search, availability, pricing |
+| **3** | Add identity | OAuth 2.1, per-user binding |
+| **4** | Add authorization | mandates with limits and revocation |
+| **5** | Add transactions | guardrails and evidence from day one |
+| **6** | Instrument everything | risk signals and audit trails |
 
 </div>
 
 <v-click>
 
-<div class="pt-6">
+<div class="pt-4 text-xl">
 
-It removed **none** of the problems in this course.
+Steps one and two cost almost nothing, are useful whether or not the rest ever
+happens — and agents are already looking.
 
 </div>
 
@@ -1599,36 +2044,54 @@ It removed **none** of the problems in this course.
 
 ---
 
-# Production complexity moved up the stack
-
-<div class="pt-8 text-2xl text-center">
-
-Out of transport.
+# The protocol argument, now earned
 
 <div class="pt-6">
 
-Into identity, authority, tool design,
-evidence, and deployment durability.
+MCP went stateless on 2026-07-28. It removed **real** operational pain — sticky
+sessions, shared session stores, sessions dying with a container.
 
 </div>
 
+<v-click>
+
+<div class="pt-6 text-xl">
+
+It removed **none** of the problems in this course.
+
 </div>
+
+</v-click>
+
+<v-click>
+
+<div class="pt-8 text-2xl text-center">
+
+Production complexity moved **up the stack** —
+
+into identity, authority, tool design, evidence, and deployment durability.
+
+</div>
+
+</v-click>
 
 ---
 
-# Take this home
+# Take this home — each line has its artifact
 
 <div class="text-sm pt-2">
 
-1. Bind identity from the token, never from an agent argument
-2. Let the model produce structure; never let it produce authority
-3. Separate authority to act from authority to pay; gate both on reversibility
-4. Denominate the bound in the units the customer meant
-5. An approval the agent can invoke is not an approval
-6. Make in-mandate autonomy the success path; escalate by exception
-7. Idempotency on every state-changing tool
-8. Free text never widens a mandate
-9. Evidence must be checkable, not narrative
+| | The rule | Where it lives |
+|---|---|---|
+| 1 | Bind identity from the token, never from an agent argument | code-tour §3 |
+| 2 | Let the model produce structure, never authority | `examples/purchase-profile` |
+| 3 | Separate authority to act from authority to pay | code-tour §4, §6 |
+| 4 | Denominate the bound in the units the customer meant | `examples/mandate-check` |
+| 5 | An approval the agent can invoke is not an approval | commit `2acc16c` + MRTR |
+| 6 | Make in-mandate autonomy the success path | design doc §2 |
+| 7 | Idempotency on every state-changing tool | `examples/idempotency` + Lab 2 |
+| 8 | Free text never widens a mandate | `examples/injection-filter` |
+| 9 | Evidence must be checkable, not narrative | `course-client` evidence record |
 
 </div>
 

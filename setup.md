@@ -60,8 +60,17 @@ CHECKPOINT OK — <your track> — https://mockhub.kousenit.com
 the chat. That's the whole checkpoint — it exists so any setup problem surfaces ninety
 minutes before the lab needs your setup to work.
 
+## Optional: pre-install Lab 2's dependencies
+
+Lab 2 (`labs/guarded-tool/<track>`) runs entirely on your machine and uses the same
+toolchain you just verified. Installing ahead saves a minute in class:
+
+- **TypeScript:** `cd labs/guarded-tool/typescript && npm install`
+- **Python:** `cd labs/guarded-tool/python && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`
+- **Java:** nothing — the Gradle wrapper fetches on first run.
+
 ## Nothing else is required
 
 - No accounts, no API keys, no Docker, no database.
-- The lab runs against the hosted MockHub instance over HTTPS.
-- An IDE helps but any editor works; the lab is a single test file in your track.
+- Lab 1 runs against the hosted MockHub instance over HTTPS; Lab 2 is fully local.
+- An IDE helps but any editor works; each lab is a single file you edit in your track.

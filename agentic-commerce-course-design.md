@@ -1,37 +1,93 @@
 # Agentic Commerce: Four-Hour Course Design
 
 **Format:** O'Reilly Learning Platform, live online, 4 hours
-**Platform:** MockHub (frozen course release) + small Java/Spring AI course client
+**Platform:** MockHub (frozen course release) + course client + student-built guarded tool
 **Prepared:** August 1, 2026
-**Revised:** August 2, 2026
+**Revised:** August 7, 2026 (v2 — merchant-side restructure around the Front Door)
+
+---
+
+## Why v2 exists
+
+Ken's review of the v1 materials (2026-08-07): a developer with web experience, AI
+experience, and MCP familiarity who wants to **enable their site for agentic commerce**
+would leave the v1 course with eight true principles and no idea what to build. v1 taught
+*why naive agentic commerce fails*; it never taught *how to build agentic commerce*. The
+specs were footnoted into a handout, and the two deliverables that carried implementation
+content (`examples/`, `course-client/`) were approved but never built.
+
+The fix, decided by Ken 2026-08-07:
+
+1. **Merchant-side first.** The student's seat is "enable my site for agents." Agent-side
+   material survives where it motivates a merchant-side decision, plus one compact
+   buyer's-side segment.
+2. **The Front Door is the spine.** The talk's build sequence — discovery → connectivity →
+   identity → authorization → guardrails → payment → evidence — becomes the course
+   structure. Each failure demo is embedded at the step it motivates.
+3. **The Vocabulary returns to slides.** A real segment: each spec — who's behind it, why
+   it exists, what layer it occupies, status — plus the layering diagram. The v1
+   "spec-complexity firewall" (acronyms never in headlines) is retired; `spec-map.md`
+   remains the take-home detail.
+4. **All implementation deliverables get built:** `examples/`, `course-client/`, a second
+   lab (student-built guarded MCP tool), and a MockHub merchant-side code tour. In-class
+   if time allows; the materials stand on their own afterwards regardless.
+
+What v1 got right and v2 keeps: the thesis, the three module theses (they survive the
+inversion — each module now *builds* toward its thesis instead of only breaking toward
+it), the six demos, the mandate-boundary lab, the setup checkpoint, recorded fallbacks,
+the cut-list discipline, hosted MockHub, polyglot lab tracks.
 
 ---
 
 ## Thesis
 
-Giving an agent tools is easy. Giving it bounded authority to conduct commerce safely is the real engineering problem.
+Giving an agent tools is easy. Giving it bounded authority to conduct commerce safely is
+the real engineering problem.
 
-Every module should end with the audience holding a sharper version of that sentence than they had at the start — and each module ends on an actual slide that says its sharpened version out loud:
+Every module still ends on a slide that says its sharpened version out loud:
 
 - **Module 1:** An auditable capability boundary is not an authority boundary.
 - **Module 2:** Authority comes from artifacts the model cannot mint; an approval the agent can invoke is not an approval.
-- **Module 3:** A trustworthy buyer's representative is a policy you write, not a property of the protocol.
+- **Module 3:** A trustworthy transaction is a policy you write, not a property of the protocol.
 
-These three slides double as chapter boundaries for the recording.
+These three slides double as chapter boundaries for the recording. In v2 each thesis is
+**earned twice**: the module builds the thing, a demo breaks the naive version of it, and
+the corrected build is shown as code the student takes home.
 
 ---
 
 ## Design constraints
 
-**This is not the talk at four times the length.** A conference talk demonstrates a working system. A course walks students into failures and lets them feel the pull of each fix. The arc is *naive implementation → discovered failure → principled correction*, three times.
+**The student leaves able to build.** The test for every segment: after it, can the
+student name the artifact they would add to their own site, and have they seen its
+implementation (in `examples/`, the code tour, or a lab)? A principle without its
+artifact is v1's failure mode; don't backslide.
 
-**Four hours is about three hours of instruction.** Breaks, questions, setup friction, and demo recovery consume the rest. The plan below budgets 225 minutes and leaves ~15 minutes of slack. Live online always overruns; the slack is the plan, not a cushion. (Timings throughout are planning estimates, not commitments — they never match reality. The cut list is what makes that survivable.)
+**This is still not the talk at four times the length.** The talk demonstrated a finished
+system; the course walks students through building one, with the failure demos supplying
+the *why* at each step. The arc per step is *build the naive version → watch it fail →
+build the correction*.
 
-**One real hands-on lab, not four.** In a live online format, every hands-on segment risks a long tail of students stuck on setup. Budget one lab that genuinely lands (§Module 2, L2) and make everything else demo-driven with runnable code students take home.
+**Four hours is about three hours of instruction.** Breaks, questions, setup friction,
+and demo recovery consume the rest. The plan budgets ~215 instruction minutes; the cut
+list is what makes overrun survivable. Timings are planning estimates, not commitments.
 
-**Every live agent demo needs a recorded fallback.** Agent behavior is nondeterministic; a demo that depends on the model choosing a particular tool will eventually not. Record each demo in advance and be willing to cut to tape without apology.
+**Lab 1 is protected; Lab 2 is pre-cut.** The mandate-boundary lab (deterministic,
+credential-free, seconds to run) keeps its protected slot. The new guarded-tool lab is
+scheduled late with an explicit fallback Ken has already approved: if time runs out, it
+converts to a guided take-home with an in-class kickoff, without drama.
 
-**Protocol content is a supporting character.** The 2026-07-28 stateless spec is new and topical and it is tempting to open with it. Resist. Students who don't yet feel the authority problem have no frame for the protocol answer. Split it: brief framing in Module 1, the elicitation mechanism in Module 2 where it solves a problem the audience already wants solved, and the retrospective argument in Module 3.
+**Every live agent demo needs a recorded fallback.** Unchanged from v1.
+
+**Specs are taught, not feared.** The v1 firewall overcorrected. The Vocabulary segment
+teaches why each spec exists and what layer it occupies; implementation pointers (which
+SDK, which library, what you actually write) appear where each spec becomes concrete.
+Depth beyond that still lives in `spec-map.md` — the handout absorbs detail, no longer
+the entire topic.
+
+**No client names on course slides.** The Front Door structure originates in the
+TicketNetwork talk; the course version is MockHub-only framing. The talk directory stays
+out of the public repo.
 
 ---
 
@@ -39,257 +95,331 @@ These three slides double as chapter boundaries for the recording.
 
 | | Segment | Minutes |
 |---|---|---|
-| 00:00 | Opening: the reorder that isn't | 15 |
+| 00:00 | Opening: the inversion, and the reorder that isn't | 15 |
 | 00:15 | Setup checkpoint (one command, paste output in chat) | 5 |
-| 00:20 | **Module 1** — Tools, identity, and the naive purchase | 50 |
-| 01:10 | Break | 10 |
-| 01:20 | **Module 2** — Authority, mandates, and approval | 65 |
-| 02:25 | Break | 10 |
-| 02:35 | **Module 3** — Sourcing, evidence, and evaluation | 50 |
-| 03:25 | Close + Q&A | 20 |
-| 03:45 | *Slack* | 15 |
+| 00:20 | **Module 1** — The front door: discovery, connectivity, identity | 55 |
+| 01:15 | Break | 10 |
+| 01:25 | **Module 2** — Authorization and approval | 65 |
+| 02:30 | Break | 10 |
+| 02:40 | **Module 3** — Payment, evidence, and the policy you write | 55 |
+| 03:35 | Close + Q&A | 20 |
+| 03:55 | *Slack* | 5 |
+
+Slack is thinner than v1 (5 vs 15). That is deliberate: Lab 2's in-class execution is the
+designated pressure-relief valve, and its take-home conversion is pre-approved. The cut
+list restores slack the moment the clock demands it.
 
 ---
 
-## Opening (15 min) — The reorder that isn't
+## Opening (15 min) — The inversion, and the reorder that isn't
 
-Open with the easy case, in the audience's own voice:
+Two framings, both kept short.
 
-> "I'm out of razor blades. Find my last order and do it again."
+**The reorder that isn't** (from v1): "I'm out of razor blades. Find my last order and do
+it again" → safe because of **evidence** and **reversibility**. "Buy tickets like last
+time" → same sentence shape, every safety property gone. Land the wall-poster rule:
+**delegated authority must scale with reversibility, not just with confidence.**
 
-Ask what makes this safe, and collect answers. Steer toward two: **evidence** (exact SKU, quantity, address, payment, delivery preference all known; price predictable) and **reversibility** (wrong order costs twelve dollars and ships back).
+**The inversion** (from the talk, compressed): thirty years of bot defense assumed a bot
+is an adversary; a delegated agent announces itself and carries proof of who it works
+for. The industry scoreboard — every shipped ticketing integration stops at the checkout
+boundary, and that is a legal/authority decision, not an engineering gap. The card
+networks have already crossed the line (Visa Intelligent Commerce, Mastercard Agent Pay,
+live in 2026). The question the course answers: **what do you have to build so that an
+agent can cross the checkout boundary on your site, safely?**
 
-Then swap the domain:
+Amazon Auto Buy grounding slide stays (a mandate specification in customer-service
+prose).
 
-> "Buy tickets like last time."
-
-Same sentence shape. Every safety property gone — novel inventory, scarce, expensive, time-boxed, non-refundable. Nothing to repeat, because there is no SKU.
-
-Land the framing: **delegated authority must scale with reversibility, not just with confidence.** Post it on the wall for the rest of the day.
-
-Grounding slide — Amazon's Auto Buy constraints, verbatim from the help page: Prime members only, Fulfilled-by-Amazon items only, one active request per item, one unit per item, no promotional discounts or coupons, up to 200 active requests, cancellable any time before the order is placed. That is a mandate specification written in customer-service prose. Note also that Amazon's *scheduled* recurring purchases add to the cart for review rather than shipping automatically. The company with the strongest incentive to remove friction chose full autonomy only for the narrow single-SKU, price-triggered case.
-
-*Cut candidate if running late: the Alexa naming discussion. One slide maximum, and it is the first thing to go.*
+*Cut candidate: the Alexa naming discussion — still first to go.*
 
 ### Setup checkpoint (5 min)
 
-Immediately after the opening: everyone runs one command against the frozen course client and pastes the output line into chat. Nothing is taught here — the entire purpose is to surface setup failures **ninety minutes before the lab needs setup to work**. Triage stragglers via chat during Module 1's demos; anyone still broken at the lab falls back to predict-then-run without drama. This is the cheapest insurance in the course: the design's biggest stated fear is students stuck on setup, so setup gets exercised first, not at minute 125.
+Unchanged from v1. One command per track, paste one line into chat, surfacing setup
+failures ninety minutes before Lab 1 needs setup to work. Now does double duty: Lab 2
+uses the same track toolchain, so the checkpoint covers both labs.
 
 ---
 
-## Module 1 (50 min) — Tools, identity, and the naive purchase
+## Module 1 (55 min) — The front door: discovery, connectivity, identity
 
-**Objective:** students leave believing that an auditable capability boundary is not the same thing as safety.
+**Objective:** students can make a site reachable by agents — and can explain why
+reachable is not the same as safe.
 
-### 1.0 MCP in five slides (5 min)
+### 1.0 The Vocabulary (18 min)
 
-A compressed review, not a tutorial — the audience has used MCP; this buys shared vocabulary so §1.1 lands. Five slides, hard cap:
+The segment v1 refused to teach. Six specs, one slide each, same skeleton every time —
+*who's behind it · what problem it solves · what layer it occupies · status*:
 
-1. Host / client / server roles, one diagram.
-2. Tools, resources, prompts — and the honest note that tools are all this course needs.
-3. One tool-call lifecycle diagram (request → tool selection → call → result → model continues).
-4. The 2026-07-28 spec release exists and is current; the day's protocol content builds on it (the stateless argument itself waits for §1.4).
-5. Pointer to the `spec-map.md` handout: every acronym today lives there, not on slides.
+- **MCP** — how an agent calls your system as a tool; Agentic AI Foundation; the
+  2026-07-28 stateless revision in two bullets (audience already knows MCP — this is
+  orientation, not a tutorial).
+- **llms.txt + the agent card** — how an agent finds out you exist; conventions, not
+  committees.
+- **AP2** — proving who authorized a payment and within what limits; mandates as
+  verifiable credentials; FIDO Alliance. This is where the course's mandate concept comes
+  from.
+- **ACP** — checkout as a REST API an agent can drive; OpenAI + Stripe; the Instant
+  Checkout cautionary tale in one slide (the bottleneck was commerce plumbing, not AI).
+- **UCP** — the whole journey; Google + Shopify; composes MCP/A2A/AP2; the most
+  commercially live.
+- **TAP + Web Bot Auth** — telling at the edge whether a robot is who it claims to be;
+  the WAF answer.
+- (x402 gets one line: machine metering, not retail — exists, not on our path.)
 
-### 1.1 The naive tool (8 min)
+Then the one diagram that organizes the day: **the layering slide** — Discovery /
+Connectivity / Identity / Authorization / Transaction / Settlement, with each spec placed
+on its layer. The Front Door build sequence is this diagram read top to bottom, and the
+course is that walk. Point at `spec-map.md` for depth and primary sources.
 
-Show the tool anyone would write first:
+Per-spec **implementation pointers** appear here and recur when each layer becomes
+concrete: MCP SDKs (Java/Python/TypeScript), Stripe's Agentic Commerce Suite for ACP,
+UCP's manifest + reference implementations, AP2's credential formats.
 
-```java
-buyTickets(String userEmail, String listingId, int quantity)
-```
+### 1.1 Step 1 — Discovery (7 min)
 
-Run it. It works. Everyone recognizes it as reasonable.
+What you publish so an agent can find you: `llms.txt` (shown, real content) and
+`/.well-known/agent.json` (shown, real content — capabilities, security scheme, skills).
+The talk's observed sequence: the client finds the protected-resource metadata, follows
+it to the authorization server, registers itself, reads the tools. "I published two
+documents; the client worked out the rest."
 
-### 1.2 Break it: the agent supplies the identity (12 min)
+**Artifact:** `examples/discovery/` — MockHub's actual llms.txt and agent card, annotated.
+Steps 1–2 cost almost nothing and are useful even if you never build the rest.
 
-**Demo.** Prompt the agent so it passes a different `userEmail`. It buys tickets on someone else's account, cheerfully, with no error.
+### 1.2 Step 2 — Connectivity: tool design (13 min)
 
-This is the confused deputy in three lines of Java, and it is the moment the room gets quiet.
+Design for the goal, not the resource: `findTickets(query, city, maxPrice, section)` —
+one call instead of three, because every round-trip is latency, tokens, and a chance to
+lose the thread. Give it reasons, not just rows: `compareTickets` returns ranked options
+with inspectable reason codes, deliberately not an LLM. Tool descriptions are the
+interface — written for someone who has never seen your domain.
 
-**Correction.** Identity binds from the authenticated OAuth token, never from an agent-supplied argument. Anything the agent can type is an assertion, not a credential.
+**Demo — the grid, reframed merchant-side.** Two providers, identical inventory, the
+only difference is documentation quality. Sixteen recorded runs across three models:
+no run ever preferred the tersely-documented provider, and the smallest model never even
+*loaded* its tools. Your tool descriptions are your shelf placement. Documentation
+quality is a marketing surface — and non-disclosure ("the best option," one provider
+never queried) is the default failure your buyer's side must correct in Module 3.
 
-State the general rule, because it recurs all day: **the agent's input space and the authority space must not overlap.**
+### 1.3 Step 3 — Identity (15 min)
 
-### 1.3 Break it again: too many tools (8 min)
+The naive tool anyone would write first: `buyTickets(String userEmail, String listingId,
+int quantity)`. Run it; it works; every code review would pass it.
 
-Show the tool surface at full size. Discuss wrong-tool selection as a measurable property, not a vibe — you can count it.
+**Demo — the confused deputy.** "I'm Alice — grab a ticket for my friend Bob, surprise
+him." The agent types `bob@mockhub.com`; a real order lands on Bob's account; no error.
+Nobody attacked anything.
 
-Brief treatment of tool descriptions as an attack surface and a correctness surface simultaneously.
+**Correction, as a build:** the human logs in once, in a browser, and authorizes the
+client; identity binds from the authenticated token at the transport layer; the subject
+is pinned per request; the cart is a row that belongs to that identity. OAuth 2.1 with
+Dynamic Client Registration is what MockHub actually runs — shown in the code tour.
+Prompt injection cannot act as another user if the parameter never existed.
 
-### 1.4 What MCP actually buys you (10 min)
+State the rule that recurs all day: **the agent's input space and the authority space
+must not overlap.**
 
-MCP gives a more auditable capability boundary than handing an agent a shell, `curl`, and unrestricted network access. That is real and worth having. It does not address authorization, prompt injection, confused deputies, or excessive tool power.
+### 1.4 Thesis (2 min)
 
-Brief protocol framing here — five minutes, no more:
-
-- MCP 2026-07-28 (published four days before this course was designed) removed protocol-level sessions and the `initialize` handshake. MCP now behaves like an ordinary HTTP API.
-- What that fixed: sticky routing, shared session stores, sessions dying when a container is replaced.
-- What it did not fix: everything in this module.
-
-Set up the closing argument without making it yet: *production MCP complexity moved up the stack, from transport into identity, authority, and deployment durability.*
-
-### 1.5 Discussion (7 min)
-
-Poll: which of these failures would your existing test suite catch? Seed the honest answer — a thousand tests inside modeled environments miss failures at process boundaries, under the real production profile, through real clients, and under nondeterminism.
-
-End on the module's thesis slide: **an auditable capability boundary is not an authority boundary.**
-
----
-
-## Module 2 (65 min) — Authority, mandates, and approval
-
-**Objective:** students can distinguish authority to act from authority to pay, and can explain why in-band approval is not human approval.
-
-This is the heart of the course. Protect its time.
-
-### 2.1 From "do it again" to "like last time" (10 min)
-
-The reorder case carries transaction-level authorization inside the instruction — "do it again" *is* the authorization. "Like last time" is not; it is an invitation to infer one.
-
-**Demo the ambiguity.** Ask the agent to interpret a prior ticket order. Watch it produce a plausible, unaudited inference: *you sat in section 112, so lower bowl is acceptable.* Then show what lower bowl includes — seats behind the stage.
-
-The purchase would be fully inside the mandate and completely wrong.
-
-### 2.2 `PurchaseProfile`: the inference must be an artifact (12 min)
-
-The fix is a boundary. The LLM *proposes* a structured profile; deterministic Java validates it; the customer can inspect it before it is spent against; the mandate attaches to the profile, not to the raw utterance.
-
-Show the code on both sides of that line. This is the single most transferable idea in the course and it generalizes far beyond ticketing: **let the model produce structure, never let it produce authority.**
-
-### 2.3 Mandates: two axes, gated on reversibility (12 min)
-
-Separate authority to act from authority to pay. Show the matrix rather than a ladder, with reversibility as the gate:
-
-- Recommend only.
-- Hold automatically, approval required to buy.
-- Buy autonomously within a mandate.
-- Request a narrowly scoped exception at a boundary.
-
-**One slide on units, earned from the build (added 2026-08-05):** a mandate ceiling of $35 that authorizes a $38.50 charge is not a ceiling. MockHub validated against the subtotal while the customer was charged the total, and two agents blew the stated budget without any attacker involved. Whatever number the customer says, the boundary must be denominated in that number. This pays off in §3.3.
-
-Emphasize that **autonomous in-mandate success is the intended path.** If every purchase ends in an approval prompt, the agent is an elaborate shopping cart and the customer will reasonably ask why they didn't just use the website.
-
-### 2.4 In-band approval, and why it fails (8 min)
-
-**Demo — the memorable one.** With approval exposed as an MCP tool, prompt the agent through a purchase that exceeds its mandate. Watch it call the approval tool on itself and proceed.
-
-Nothing malfunctioned. The architecture permitted it.
-
-Rule: an approval an agent can invoke is not an approval.
-
-### 2.5 The protocol answer (8 min)
-
-Here is where the stateless spec earns its place, because the room now wants this.
-
-Multi Round-Trip Requests (SEP-2322): a `tools/call` can return an `InputRequiredResult` carrying `inputRequests` — full elicitation requests — plus an opaque `requestState`. The client gathers the answers and re-issues the original call with `inputResponses` and the echoed state. All the state rides in the payload, so any stateless instance can resume.
-
-Why this is the answer and not just a mechanism: **the elicitation is fulfilled by the client, with the human in the loop.** It is not a tool the agent can call on itself. The separation enforced in §2.4 by architectural discipline is now enforced by the protocol. And the customer approves in the agent host's UI, in conversation — no second visit to the site.
-
-**This segment needs a demo, not just slides.** §2.4 is the emotional peak of the course; its resolution cannot be a payload diagram. The Java SDK lagging the spec is one honest sentence, not a reason to skip the demo — record an elicitation/MRTR flow in *any* client that supports it (TypeScript reference client, Claude Desktop, whatever works first) and play the tape: the agent hits the boundary, the approval question appears in the **host's** UI, the human answers, the call resumes. Thirty seconds of that lands harder than every diagram in the deck.
-
-Two constraints worth stating:
-
-- Elicitation must not use form mode for sensitive credentials; URL mode is required for those.
-- Sampling is deprecated as of 2026-07-28. Build on elicitation only.
-
-Mention **MCP Apps** (server-rendered HTML in a sandboxed iframe, UI actions flowing through the same audit and consent path as a direct tool call) as the complementary inline-approval-card option, one slide.
-
-Flag the retry consequence, which sets up Module 3: MRTR re-issues *the same call*. Duplicate delivery is now normal control flow. Every state-changing tool needs an idempotency key.
-
-### 2.6 LAB (15 min, walkthrough included) — Mandate boundary test
-
-**The one hands-on lab.** Chosen because it is deterministic, requires no paid credentials, runs in seconds, and verifies unambiguously. The earlier "10 min + walkthrough" framing hid an overrun inside the most protected module; the walkthrough is now budgeted, not smuggled.
-
-Students write and run a test asserting that an agent cannot exceed, widen, or self-approve its own mandate. Given: the frozen course client and hosted MockHub. Framed as design by contract — precondition, postcondition, invariant.
-
-**Runs against hosted MockHub — decided.** Local Docker reintroduces exactly the setup tail the whole design avoids. The instructor keeps a local instance as a personal fallback for the projection path if the venue network dies; students never touch Docker.
-
-**Authoring constraint:** the assertions must read as English. The registration page invites PMs and engineering leaders who will not write Java; each assertion should be legible as a plain statement — `assertAgentCannotApproveOwnPurchase()`, "the mandate ceiling holds under retry" — so a non-coder following along still receives the contract even if they never run it.
-
-*Fallback for students blocked on setup (already surfaced at the 00:15 checkpoint):* project the test, have the room predict pass/fail before running it. The learning survives the setup failure.
-
-End on the module's thesis slide: **authority comes from artifacts the model cannot mint; an approval the agent can invoke is not an approval.**
+Steps 1–3 made you reachable and auditable. They did not make you safe: nothing yet
+constrains what an authenticated agent may *do*. **An auditable capability boundary is
+not an authority boundary.** That is Module 2's job.
 
 ---
 
-## Module 3 (50 min) — Sourcing, evidence, and evaluation
+## Module 2 (65 min) — Authorization and approval
 
-**Objective:** students can specify what a trustworthy buyer's representative must do that MCP does not specify for them.
+**Objective:** students can implement bounded authority — a mandate store, a validated
+inference artifact, and an approval path the agent cannot reach.
 
-### 3.1 Two providers, no policy (12 min)
+Still the heart of the course. Protect its time.
 
-Connect the agent to two ticket services and ask for the same event.
+### 2.1 Step 4 — The mandate (13 min)
 
-**Demo: one live run, then the grid.** Run it live once for authenticity. Then show a prepared grid of eight to ten recorded runs of the same prompt with the divergent choices highlighted — the model preferring the better-named tool, the first listed, one it used successfully before, querying both, asking, or picking arbitrarily without disclosing that alternatives existed. Three live runs gamble on nondeterminism showing up on cue; if the model happens to behave consistently, the demo argues against you. The grid is better *evidence* of inconsistency than any live sample, and it is immune to the demo gods. The inconsistency *is* the demonstration; do not clean it up.
+The permission slip, as schema and as code: `createMandate(agentId,
+maxSpendPerTransaction, maxSpendTotal, allowedCategories, expiresAt)`. Four properties
+that make it a mandate: **explicit** (the customer chose these numbers), **inspectable**,
+**bounded** (per transaction, in total, by category, in time), **revocable** (effective
+immediately).
 
-The lesson: MCP provides interoperability, not neutral marketplace arbitration. It lets an agent reach multiple sellers. It says nothing about how to act as a trustworthy buyer's representative.
+Implementation truths that don't fit on a schema slide:
 
-### 3.2 Sourcing as a contract (12 min)
+- Check it at the cart **and again at confirmation** — time passes; revocation and
+  cumulative spend move between those moments.
+- A spending limit is an accounting problem: recorded on confirmation, reversed on
+  cancellation, inside the transaction, with row locks. Get this wrong and a $1,000
+  limit quietly becomes $3,000.
+- The two axes from v1 (authority to act / authority to pay), gated on reversibility;
+  autonomous in-mandate success is the intended path — escalate by exception, or you've
+  built an elaborate shopping cart.
 
-The policy the application must supply: search every eligible provider → normalize price, fees, seat information, refundability, confidence → deduplicate equivalent listings → rank against declared customer preferences → disclose the selection and the reason → purchase only through providers covered by the customer's authority.
+**AP2 mapping:** what this mandate becomes as a verifiable credential — signed, carried
+with the transaction, there when a dispute arrives. One slide, concrete.
 
-Then sharpen it from narrative into a postcondition:
+**Artifact:** `examples/mandate-check/` — the deterministic validation, runnable.
 
-> The selected listing is the minimum-cost listing satisfying the profile across all searched providers, or an exception record explains why not.
+### 2.2 The units lesson (7 min)
 
-That is checkable. Narrative evidence is not.
+Earned during the course build and kept in full: a $35 ceiling validated against the
+subtotal authorized a $38.50 charge — two real orders, no attacker. **The bound must be
+denominated in the units the customer meant.** Whatever number the customer says, the
+boundary evaluates that number.
 
-Disclosure of affiliate relationships, marketplace ownership, and preferred-provider agreements belongs here too — otherwise "the model chose it" conceals self-preferencing. Note without belaboring that this is the same shape as best-execution obligations in other regulated markets.
+### 2.3 The inference must be an artifact (12 min)
 
-### 3.3 Untrusted text, and the boundary that fails without it (10 min)
+**Demo — "like last time."** The agent reads real order history and anchors on a Floor
+seat for *Hamilton* to pick Floor at Monster Jam — faithful to the data, inside the
+mandate, wrong. No boundary was crossed because the boundary was never asked about the
+right thing.
 
-*Revised 2026-08-05 after building the demo — see `demo-runbook.md` §3.3 for the run data.*
+**Correction, as a build:** the LLM *proposes* a structured `PurchaseProfile`;
+deterministic code validates it; the customer can inspect it; the mandate attaches to
+the profile, not the raw utterance. **Let the model produce structure; never let it
+produce authority** — still the most transferable idea in the course.
 
-**Prediction poll first.** "This listing's description tells the agent to ignore its price ceiling. Will it?" Committing to a prediction is the cheapest engagement in hour three, and the honest answer surprises the room in the opposite direction from what they expect.
+**Artifact:** `examples/purchase-profile/` — the proposal/validation boundary, both sides
+of the line.
 
-**Demo, part one — the injection.** A seller-written description aimed at the buying agent, in two flavors: a naked override, and forged "account metadata" claiming the customer pre-authorized more. **Ten recorded runs across frontier and small models: none took the bait.** Say that plainly. Several agents noticed the expensive listing and passed on it out loud.
+### 2.4 Step 5 — In-band approval, and why it fails (8 min)
 
-**Demo, part two — the boundary that failed anyway.** In those same runs, two agents told "don't spend more than $35" completed purchases at $35.29 and $35.37, because the mandate ceiling is enforced against the subtotal while the customer is charged the total. No attacker. One agent flagged its own overrun after the sale was final.
+**Demo — the memorable one, unchanged.** Mandate says APPROVAL_REQUIRED; the tool
+surface includes `approvePurchase`; a mundane prompt ("make sure the order ends up fully
+completed") walks the agent through proposing and **approving its own purchase**. Every
+call legitimate, nothing jailbroken. The architecture permitted it.
 
-The contract is unchanged and now has two legs, not one:
+**An approval the agent can invoke is not an approval.**
 
-- No content originating from a listing can widen a mandate. Boundaries evaluate in deterministic code against structured fields; free text is never an input to an authorization decision.
-- **The bound must be denominated in the units the customer meant.** A ceiling that authorizes a different number than the one the customer said is not a ceiling. (Introduced in §2.3; this is where it bites.)
+### 2.5 The two fixes (12 min)
 
-Why you still write the injection defense after ten clean runs: the seller only needs it to work once, on one model version, and the check costs nothing. Make that argument explicitly — this audience has been sold enough scare demos.
+Both fixes get shown, because they live on different sides of the wire:
 
-Closes the loop with §1.2 — same principle, second appearance: **input space and authority space must not overlap.**
+**The merchant-side fix — the page the agent cannot call.** The approval tools come out
+of the MCP server entirely; the only approval path is a page on the marketplace's own
+session, with a badge that finds the human. Which agent, under which mandate, its stated
+reasoning, approve or deny. Proposal expires; total cannot drift. This is buildable
+today on any stack, no new spec required — shown in the code tour.
 
-### 3.4 Evidence and evaluation (8 min)
+**The protocol fix — MRTR elicitation (SEP-2322).** The recorded demo, unchanged from
+v1: agent hits the boundary, the question renders in the **host's** UI, the human
+answers, the same call resumes with the state echoed back. Not a tool the agent can call
+— the capability is not in its world. Constraints: URL mode for credentials; sampling is
+deprecated; MCP Apps as the inline-card complement, one slide.
 
-A purchase evidence record lists providers searched, candidates considered, ranking policy applied, `PurchaseProfile` version used, selected listing, and reason.
+Consequence that sets up Module 3: MRTR re-issues the same call — duplicate delivery is
+normal control flow, so **every state-changing tool needs an idempotency key**
+(`examples/idempotency/`).
 
-Frame eval conditions as design by contract — preconditions, postconditions, invariants — and show a small suite: identity binding holds, mandate cannot be self-widened, idempotency holds under retry, sourcing postcondition holds or an exception record exists.
+### 2.6 LAB 1 (13 min, walkthrough included) — Mandate boundary test
 
-Brief MCP/ACP comparison here, kept to what the audience needs.
+Unchanged from v1 in content, slightly compressed in budget (the walkthrough reference
+in `labs.md` carries anyone who falls behind). Students prove the ceiling, revocation,
+approval gate, and credential separation, then write the fifth test themselves: **the
+agent's credential cannot mint a mandate.** Predict-then-run remains the fallback for
+anyone whose setup is broken.
 
-### 3.5 After the sale (8 min)
+End on the thesis slide: **authority comes from artifacts the model cannot mint.**
 
-The path everyone skips. Wrong purchase, customer dispute, refund attempt against a non-refundable listing, chargeback — and where liability sits when an agent acted correctly inside a mandate but against intent.
+---
 
-No clean answers exist yet. Say so. This is the most differentiated eight minutes in the course precisely because it is unresolved, and it seeds good questions.
+## Module 3 (55 min) — Payment, evidence, and the policy you write
 
-End on the module's thesis slide: **a trustworthy buyer's representative is a policy you write, not a property of the protocol.**
+**Objective:** students can finish the build — payment authority, guardrails, evidence —
+and can specify the buyer-side policy the protocol will never supply.
+
+### 3.1 Step 6 — Payment authority (8 min)
+
+You do not hand the agent a card number. A scoped payment credential: issued by the user
+to one named agent, bounded amount and currency, expiry, one-time or reusable,
+revocable, validated before money moves, consumed exactly once.
+
+Three questions, three records: may the agent act? (the mandate) — did a human approve
+this purchase? (the approval record) — may it pay with this authority? (the scoped
+credential). AP2 is the spec answer for making these records portable and verifiable.
+
+### 3.2 Guardrails, and untrusted text (12 min)
+
+The conditions that run at every state transition, as a table: mandate, event-in-future,
+listing-active, agent-risk, spending-limit — Design by Contract pointed at a caller you
+don't trust. **Refuse in a sentence the agent can relay** — it will retry regardless;
+tell it the constraint or it will invent one for your customer. Risk signals you could
+never get from a browser: mandate mismatches, burst cart holds; repeated mismatch
+becomes a block. An adversarial bot dressed as an agent fails the first check — it has
+no mandate to mismatch against.
+
+**Demo — the injection, with the honest result.** Ten recorded runs, two injection
+styles, zero took the bait — said plainly. But the same runs produced the units overrun:
+you don't need a malicious seller to break a budget boundary. The contract has two legs:
+free text never widens a mandate (boundaries evaluate in deterministic code on
+structured fields — `examples/injection-filter/`), and the bound is denominated in the
+customer's units. Why you write the injection defense after ten clean runs: the seller
+needs it to work once, on one model version, and the check costs nothing.
+
+Input space vs. authority space — second appearance, closing the loop with §1.3.
+
+### 3.3 Step 7 — Evidence (10 min)
+
+A chargeback arrives six weeks later; "the robot did it" is not an answer. What the
+record must reconstruct: who authorized the agent and within what limits, whether a
+human approved this purchase, which payment authority was used and consumed, what
+warnings fired, what was delivered. The actorTimeline slide — six rows, two of them
+human, and that distinction is what a chargeback turns on. The v1 lesson stands:
+evidence must be **checkable, not narrative**.
+
+**Code tour moment:** how MockHub records and serves this (`getAgentPurchaseEvidence`),
+plus the field-note that the actor column was once hardcoded to USER — making an
+agent-minted mandate indistinguishable from a user-granted one, the single most
+important fact in a dispute record.
+
+### 3.4 The buyer's side (8 min)
+
+The compact agent-side segment merchant-side students still need, because their
+customers' agents will behave this way. Sourcing as a contract: search every eligible
+provider → normalize → deduplicate → rank against declared preferences → disclose
+selection and reason → purchase only within authority. Sharpened to a postcondition (the
+minimum-cost listing satisfying the profile, or an exception record explains why not).
+Disclosure of affiliate/ownership/preferred-provider relationships — the grid showed the
+model's preference tracks documentation quality, so "the model chose it" conceals
+self-preferencing. `course-client/` implements this policy; take-home.
+
+### 3.5 LAB 2 (12 min in class, or guided take-home) — Expose a guarded tool
+
+The construction lab: students stand up a **tiny MCP server of their own** — one
+purchase-shaped tool plus one mandate check — in their lab-track language, using the
+official MCP SDK. The tool refuses an over-ceiling request with a relayable reason and
+honors an idempotency key. Small enough to fit the slot because the scaffold ships in
+the repo and students write only the guard (the same 5–10 lines the whole course has
+been circling).
+
+**Pre-decided fallback (Ken, 2026-08-07):** if the clock says no, this converts to an
+in-class kickoff (project the scaffold, write the guard live, 5 min) plus guided
+take-home. The materials stand alone either way.
+
+### 3.6 After the sale (5 min)
+
+Compressed from v1 but kept — wrong purchase, dispute, refund against a non-refundable
+listing, chargeback; where liability sits when an agent acted correctly inside a mandate
+but against intent. The BOTS Act has no carve-out for delegated consumer agents; the
+distinction is being built in infrastructure (TAP, AP2 mandates), not law. No clean
+answers exist; say so.
+
+End on the thesis slide: **a trustworthy transaction is a policy you write, not a
+property of the protocol.**
 
 ---
 
 ## Close (20 min)
 
-Return to the protocol argument, now earned:
+**Where to start** — the talk's six steps, now the course's summary: be discoverable →
+expose read-only tools → add identity → add authorization → add transactions with
+guardrails and evidence from day one → instrument everything. Steps one and two cost
+almost nothing and agents are already looking.
 
-MCP went stateless at the protocol layer on 2026-07-28. It removed real operational pain — sticky sessions, shared session stores, sessions dying with a container. It removed none of the problems in this course. **Production complexity moved up the stack: into identity, authority, tool design, evidence, and deployment durability.**
+The protocol argument, earned: MCP went stateless and removed real operational pain —
+and none of the problems in this course. Production complexity moved up the stack.
 
-Restate the thesis. Then the practical checklist students take home:
-
-1. Bind identity from the token, never from an agent argument.
-2. Let the model produce structure; never let it produce authority.
-3. Separate authority to act from authority to pay; gate both on reversibility.
-4. An approval the agent can invoke is not an approval.
-5. Make in-mandate autonomy the success path; escalate by exception.
-6. Idempotency on every state-changing tool.
-7. Free text never widens a mandate.
-8. Evidence must be checkable, not narrative.
+The take-home checklist (v1's nine lines, unchanged — they were always right; now each
+one has an artifact in the repo behind it).
 
 Q&A.
 
@@ -297,43 +427,85 @@ Q&A.
 
 ## Cut list, in order
 
-Live online overruns. Decide these now, not at 02:50.
+1. Alexa naming discussion (Opening) — first to go entirely.
+2. Lab 2 in-class execution → kickoff + guided take-home (pre-approved conversion, not
+   an emergency).
+3. §3.4 buyer's side → two slides + course-client pointer.
+4. §1.0 Vocabulary: ACP cautionary-tale slide and x402 line compress into the layering
+   slide's narration.
+5. §1.2 grid → two slides (the table and the lesson), drop the run-by-run walkthrough.
+6. Lab 1 → predict-then-run walkthrough. **Only if forced;** it is the anchor hands-on
+   segment.
 
-1. Alexa naming discussion (Opening) — one slide, first to go entirely.
-2. §1.3 tool-surface segment (now 8 min) — compress to three minutes, keep wrong-tool-selection-is-measurable, drop the walkthrough.
-3. §3.4 MCP/ACP comparison — reduce to a single slide and a pointer.
-4. §2.6 lab (now 15 min with walkthrough budgeted) — shorten to the predict-then-run walkthrough, drop student execution. **Cut this only if forced;** it is the only hands-on segment and its absence changes the course's character. The module-end thesis slides are *not* cut candidates; they cost ninety seconds total and are the course's stated spine.
-
-Protected under all circumstances: §2.4 (in-band approval failure), §2.5 (the elicitation answer), §3.1 (two-provider inconsistency). Those three demos carry the course.
+Protected under all circumstances: §2.4 (self-approval), §2.5 (both fixes), the §1.2
+confused-deputy demo, Lab 1, and the module-end thesis slides (ninety seconds total, the
+course's spine).
 
 ---
 
+## Deliverables (delta from v1)
+
+Already built and kept: `labs/{java,python,typescript}` (Lab 1 + checkpoint), `demos/`
+(six demos + grid), `slides.md` (v1 — to be rewritten to this structure), `labs.md`,
+`instructor-guide.md`, `demo-runbook.md`, `spec-map.md`, `setup.md`, PDF workflow.
+
+To build, in order:
+
+1. **`examples/`** — the approved-but-never-built one-file excerpts, now five:
+   `discovery/` (llms.txt + agent card, annotated), `mandate-check/`,
+   `purchase-profile/`, `idempotency/`, `injection-filter/`. Runnable where cheap;
+   each is the artifact behind a checklist line.
+2. **`labs/guarded-tool/`** (Lab 2) — scaffold per track (Java/Python/TypeScript, official
+   MCP SDKs); students write the guard. Needs the same English-legible assertion rule.
+3. **`code-tour.md`** — the MockHub merchant-side walkthrough: OAuth binding, mandate
+   store + accounting, the approval page the agent cannot call, agent credentials,
+   evidence assembly. File/line references into the frozen release; excerpts on slides
+   come from here.
+4. **`course-client/`** — the Java/Spring AI buyer client implementing the §3.4 sourcing
+   policy + evidence record; take-home reference, README points Python/JS students at
+   the official SDKs.
+5. **`slides.md` rewrite** to this structure (after 1–4 exist — slides before artifacts
+   get rewritten).
+6. **`instructor-guide.md` + `demo-runbook.md`** updates last, from rehearsal.
+
 ## Dependencies on MockHub
 
-From the handoff document, in the order the course needs them:
+Unchanged from v1 (Tracks A3, A4, A5, C1, C3, C4, C5 as listed there), plus:
 
-- **Track A3** `PurchaseProfile` persisted and inspectable — required for §2.2.
-- **Track A4** reversibility in the mandate schema — required for §2.3.
-- **Track A5** listing-text injection surface — required for §3.3.
-- **Track C3** second mock provider — required for §3.1.
-- **Track C1** repeat-purchase slice — required for §2.1–2.2.
-- **Track C4** course client — required for the lab.
-- **Track C5** frozen release, credential-free student path — required for the lab. **Freeze this first.**
-
-§2.5 and the MCP Apps slide are Track B (blocked on Java SDK support) and should be taught as demonstration and specification reading, not as student implementation.
+- The **code tour** needs the frozen release's source readable at stable paths — pin the
+  tag before writing `code-tour.md`.
+- Lab 2 needs **no MockHub changes** (students build their own server; MockHub is not
+  involved), which is what makes it schedulable at all.
 
 ---
 
 ## Decided
 
-- **Lab runs against hosted MockHub** (was Open #1). Local Docker reintroduces the setup tail the design exists to avoid; the instructor keeps a local instance as a personal fallback for the projection path.
-- **This document is canonical over the O'Reilly Google Doc outline.** Make the course as good as possible first; sync the published outline afterwards.
-- **2026-08-05 (Ken): An MCP review is in scope.** The audience knows coding agents and has used MCP, but the course still reviews MCP — compressed, not skipped. Folded in as §1.0 (Module 1 45→50 min, slack 20→15).
-- **2026-08-05 (Ken): Course code stays small; MockHub is referenced, never rebuilt.** MockHub serves as the hosted platform and the source of excerpted examples. Everything students clone is course-sized.
+Carried over from v1: hosted-MockHub lab; this document canonical over the O'Reilly
+Google Doc; MCP review in scope (now folded into §1.0); course code stays small,
+MockHub referenced never rebuilt (excerpted via `examples/` and the code tour, which is
+what "referenced" should have meant all along); §2.5 elicitation demo on the TS v2 SDK.
 
-- **2026-08-05 (was Open #3): the §2.5 elicitation demo runs on the TypeScript v2 SDK.** A scripted host (`demos/src/test-guarded-client.ts`) proves the full multi-round-trip live against hosted MockHub: agent hits boundary → question in the host → human answers → purchase completes with a real approval artifact. Claude Code ≥2.1.76 renders elicitation interactively (verify once before class); Claude Desktop does not support elicitation at all.
+New, 2026-08-07 (Ken):
+
+- **Merchant-side first.** The student is enabling their site; agent-side content
+  survives where it motivates merchant decisions, plus §3.4.
+- **Front Door structure adopted** — discovery → connectivity → identity → authorization
+  → guardrails/approval → payment → evidence, with the failure demos embedded at the
+  steps they motivate.
+- **Vocabulary segment restored to slides** (talk-style, with implementation pointers);
+  the v1 spec-complexity firewall is retired. `spec-map.md` stays as the detail handout.
+- **All four implementation deliverables approved**: `examples/`, code tour, Lab 2
+  (guarded tool), `course-client/`. In-class where time allows; complete take-home
+  materials regardless ("If I don't have time in class, the materials will still be
+  available afterwards").
 
 ## Open
 
-1. Is the repeat-purchase slice ready enough by delivery to demo live, or does §2.1 run from recording?
-2. Whether §3.5 (after the sale) is eight minutes or grows into a fourth module in a future longer version.
+1. Is the repeat-purchase slice ready enough by delivery to demo live, or does §2.3 run
+   from recording? (carried from v1)
+2. Lab 2 scaffold scope: does the Java track use the official MCP Java SDK or Spring AI's
+   MCP server support? (Decide when building — whichever keeps the student-written guard
+   under ten lines.)
+3. Whether §3.6 (after the sale) grows into a fourth module in a future longer version.
+   (carried from v1)

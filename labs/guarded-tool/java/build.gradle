@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // The official MCP Java SDK — the same 2.0 generation as the TypeScript and Python tracks.
+    implementation 'io.modelcontextprotocol.sdk:mcp:2.0.0'
+
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.assertj:assertj-core:3.27.3'
+}
+
+// ./gradlew run starts the MCP server on stdio — connect Claude Code to it
+// with the provided mcp-config.json.
+application {
+    mainClass = 'lab.GuardedToolServer'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        showStandardStreams = true
+    }
+}
