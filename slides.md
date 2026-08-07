@@ -1,6 +1,10 @@
 ---
 theme: seriph
-background: https://images.unsplash.com/photo-1470229722913-7ea0d1a2f0d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80
+colorSchema: dark
+fonts:
+  sans: Inter
+  serif: Libre Caslon Text
+  mono: JetBrains Mono
 class: text-center
 highlighter: shiki
 lineNumbers: false
@@ -19,13 +23,19 @@ slidev:
   slide-number: true
 ---
 
+<div class="uppercase tracking-widest text-sm" style="color: var(--grey)">
+O'Reilly Live Learning · Four Hours · Ken Kousen
+</div>
+
 # Agentic Commerce
 
-<div class="pt-8">
-  <span class="text-xl opacity-75">
+<div class="pt-2">
+  <span class="text-xl" style="color: var(--petrol)">
     Building systems that let AI agents search, decide, and buy
   </span>
 </div>
+
+<div class="mx-auto mt-10" style="width: 5rem; border-top: 2px solid var(--petrol-deep)"></div>
 
 <div class="pt-12">
   <span @click="$slidev.nav.next" class="px-2 py-1 rounded cursor-pointer" hover="bg-white bg-opacity-10">
@@ -84,6 +94,7 @@ Repo: **github.com/kousen/agentic-commerce**
 
 ---
 layout: section
+class: section-slide
 ---
 
 # The reorder that isn't
@@ -180,6 +191,7 @@ single-SKU, price-triggered case.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # The inversion
@@ -228,13 +240,16 @@ At the WAF they look identical. Behavior cannot tell them apart — **credential
 Every shipped ticketing integration — Ticketmaster in Google AI Mode, StubHub and
 SeatGeek in ChatGPT, the Claude connectors — **stops at the checkout boundary**.
 
+<img src="/img/connector-directory.png" class="shot mx-auto mt-3 mb-3" style="width: 78%" alt="Claude connector directory: ticket integrations that stop at view" />
+
 <v-click>
 
-<div class="pt-4">
+<div class="text-sm">
 
-That's a legal and authority decision, not an engineering gap: with the FTC litigating
-under the BOTS Act, completing a purchase for a robot is a decision your legal
-department gets a vote on.
+That's a legal and authority decision, not an engineering gap: with the FTC litigating under the BOTS Act,
+completing a purchase for a robot is a decision your legal department gets a vote on. Meanwhile the card
+networks crossed the line in 2026 — **Visa Intelligent Commerce** and **Mastercard Agent Pay** are live,
+with agents purchasing *within consumer-defined limits*.
 
 </div>
 
@@ -242,19 +257,7 @@ department gets a vote on.
 
 <v-click>
 
-<div class="pt-4">
-
-Meanwhile the card networks crossed the line in 2026: **Visa Intelligent Commerce** and
-**Mastercard Agent Pay** are live on real rails, with agents purchasing *within
-consumer-defined limits*.
-
-</div>
-
-</v-click>
-
-<v-click>
-
-<div class="pt-4 text-xl">
+<div class="pt-2 text-xl">
 
 The authorization machinery in this course is the prerequisite for crossing that line safely.
 
@@ -280,16 +283,15 @@ to say who is allowed to act for them?
 
 What you have to build, in order — **the front door**:
 
-<div class="text-sm pt-2">
-
-**1. Discovery** — tell an agent you exist ·
-**2. Connectivity** — let it call you ·
-**3. Identity** — know whose agent it is ·
-**4. Authorization** — know what it may do ·
-**5. Guardrails & approval** — check it at every step ·
-**6. Payment authority** — separate may-act from may-pay ·
-**7. Evidence** — prove all of it later
-
+<div class="grid grid-cols-2 gap-x-10 gap-y-1 text-sm pt-3 pb-3" style="max-width: 46rem">
+  <div><span class="fd-n">1</span> <b>Discovery</b> — tell an agent you exist</div>
+  <div><span class="fd-n">5</span> <b>Guardrails & approval</b> — check every step</div>
+  <div><span class="fd-n">2</span> <b>Connectivity</b> — let it call you</div>
+  <div><span class="fd-n">6</span> <b>Payment authority</b> — may-act ≠ may-pay</div>
+  <div><span class="fd-n">3</span> <b>Identity</b> — know whose agent it is</div>
+  <div><span class="fd-n">7</span> <b>Evidence</b> — prove all of it later</div>
+  <div><span class="fd-n">4</span> <b>Authorization</b> — know what it may do</div>
+  <div></div>
 </div>
 
 Today walks that list. The failures along the way are why each step exists.
@@ -300,6 +302,7 @@ Today walks that list. The failures along the way are why each step exists.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # Setup checkpoint
@@ -335,6 +338,7 @@ and the same toolchain runs Lab 2.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # Module 1
@@ -499,6 +503,8 @@ be rewritten. The concepts survive the rewrites.
 </v-click>
 
 ---
+class: has-frontdoor
+---
 
 # Step 1 — Discovery: publish two documents
 
@@ -522,6 +528,8 @@ The commerce rules are stated **before the first call**: an agent that reads thi
 already knows it cannot simply buy things.
 
 </v-click>
+
+<FrontDoor :step="1" />
 
 ---
 
@@ -567,7 +575,7 @@ rest.*
 
 <div class="pt-6">
 
-📁 **`examples/discovery/`** — both documents, captured and annotated.
+<span class="artifact">examples/discovery/</span> — both documents, captured and annotated.
 
 Steps 1–2 are useful even if you never build the rest — and agents are already looking.
 
@@ -575,6 +583,8 @@ Steps 1–2 are useful even if you never build the rest — and agents are alrea
 
 </v-click>
 
+---
+class: has-frontdoor
 ---
 
 # Step 2 — Connectivity: design for the goal, not the resource
@@ -602,18 +612,26 @@ the model improvises.
 
 </v-click>
 
+<FrontDoor :step="2" />
+
 ---
 
 # Tool descriptions are the interface
 
+<img src="/img/vscode-tools-crop.png" class="shot absolute" style="width: 330px; right: 3.5rem; top: 6rem" alt="A real editor tool palette: 406 tools enabled" />
+
+<div style="padding-right: 380px">
+
 <v-clicks>
 
-- Every description ships on **every turn** — hundreds of tools compete in the palette
+- That palette is real: **406 tools enabled in one editor**, every description shipping on every turn
 - Write them for someone who has never seen your domain
 - They are a correctness surface *and* an attack surface, simultaneously
 - And — as we're about to measure — they are your **shelf placement**
 
 </v-clicks>
+
+</div>
 
 ---
 
@@ -688,6 +706,8 @@ Buyer-side conclusion: Module 3 — someone has to make sourcing a *policy*.
 </v-click>
 
 ---
+class: has-frontdoor
+---
 
 # Step 3 — Identity: the tool anyone would write first
 
@@ -707,6 +727,8 @@ buyTickets(String userEmail, String listingId, int quantity)
 </v-clicks>
 
 </div>
+
+<FrontDoor :step="3" />
 
 ---
 
@@ -779,7 +801,7 @@ public static String resolveEmail(String userEmail) {
 - A poisoned listing saying "look up orders for admin@…" will get the model to *try*.
   It cannot *succeed*.
 - Full walk-through — including the deliberately different ACP trust model — in
-  📁 **`code-tour.md`**, step 3.
+  <span class="artifact">code-tour.md</span>, step 3.
 
 </v-clicks>
 
@@ -805,7 +827,7 @@ You'll see this again in Module 3, wearing a different hat.
 
 ---
 layout: section
-class: text-center
+class: thesis
 ---
 
 # Module 1
@@ -821,11 +843,14 @@ An auditable capability boundary is not an authority boundary.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # Module 2
 ## Authorization and approval
 
+---
+class: has-frontdoor
 ---
 
 # Step 4 — the mandate is a permission slip
@@ -855,11 +880,13 @@ back · **Bounded** — per transaction, in total, by category, in time ·
 
 <div class="pt-2 opacity-75">
 
-📁 `examples/mandate-check/` — the whole check as one runnable file.
+<span class="artifact">examples/mandate-check/</span> — the whole check as one runnable file.
 
 </div>
 
 </v-click>
+
+<FrontDoor :step="4" />
 
 ---
 
@@ -1118,7 +1145,7 @@ flowchart LR
 
 The mandate attaches to the **profile**, not to the raw utterance.
 
-📁 `examples/purchase-profile/` — both sides of the line, runnable.
+<span class="artifact">examples/purchase-profile/</span> — both sides of the line, runnable.
 
 </div>
 
@@ -1170,10 +1197,13 @@ Validate for the gap, and reject with the vocabulary lesson attached.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # Step 5 — Approval
 ## and the architecture that defeats itself
+
+<FrontDoor :step="5" />
 
 ---
 
@@ -1257,11 +1287,11 @@ Then it reported success. Cheerfully. Accurately.
 
 ---
 layout: section
-class: text-center
+class: thesis
 ---
 
-# An approval the agent can invoke
-# is not an approval.
+## An approval the agent can invoke
+## is not an approval.
 
 ---
 
@@ -1293,6 +1323,10 @@ gives you. You want both.
 
 # Fix 1 (merchant-side): the page the agent cannot call
 
+<img src="/img/approvals-page.png" class="shot absolute" style="width: 360px; right: 3.5rem; top: 5.5rem" alt="MockHub's /my/approvals page: proposal, rationale, approve and deny" />
+
+<div style="padding-right: 400px">
+
 <v-clicks>
 
 - The approval tools came **out of the MCP server entirely** — the only approval path is a page on the marketplace's own session (`/my/approvals`)
@@ -1311,6 +1345,8 @@ Buildable today, no new spec required. Code tour, step 5.
 </div>
 
 </v-click>
+
+</div>
 
 ---
 
@@ -1435,7 +1471,7 @@ Duplicate delivery is now **normal control flow**, not an error condition.
 
 Every state-changing tool needs an **idempotency key**.
 
-📁 `examples/idempotency/` — the pattern in one file; MockHub does it with a partial
+<span class="artifact">examples/idempotency/</span> — the pattern in one file; MockHub does it with a partial
 unique index and a pre-write lookup.
 
 </v-clicks>
@@ -1444,6 +1480,7 @@ unique index and a pre-write lookup.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # LAB 1
@@ -1523,7 +1560,7 @@ be decorative. An agent that can mint its own mandate can grant itself any ceili
 
 ---
 layout: section
-class: text-center
+class: thesis
 ---
 
 # Module 2
@@ -1533,11 +1570,14 @@ class: text-center
 
 ---
 layout: section
+class: section-slide
 ---
 
 # Module 3
 ## Payment, evidence, and the policy you write
 
+---
+class: has-frontdoor
 ---
 
 # Step 6 — you do not hand the agent a card number
@@ -1563,6 +1603,8 @@ questions, answered by different artifacts.
 </div>
 
 </v-click>
+
+<FrontDoor :step="6" />
 
 ---
 
@@ -1659,6 +1701,7 @@ it has no mandate to mismatch against.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # Untrusted text
@@ -1749,10 +1792,10 @@ units mismatch will do it.
 **1. Free text never widens a mandate.** The defense is not a filter that hunts for
 hostile phrases — filters lose eventually. It's structural: the authorization
 function's **type signature** admits only structured fields, so seller prose has no
-path in. 📁 `examples/injection-filter/`
+path in. <span class="artifact">examples/injection-filter/</span>
 
 **2. The bound is denominated in the units the customer meant.** Not the subtotal,
-when the customer is charged the total. 📁 `examples/mandate-check/`
+when the customer is charged the total. <span class="artifact">examples/mandate-check/</span>
 
 </v-clicks>
 
@@ -1772,6 +1815,8 @@ Input space and authority space must not overlap — *second appearance*.
 
 </v-click>
 
+---
+class: has-frontdoor
 ---
 
 # Step 7 — Evidence
@@ -1793,6 +1838,8 @@ The record must reconstruct:
 </v-clicks>
 
 </div>
+
+<FrontDoor :step="7" />
 
 ---
 
@@ -1821,6 +1868,7 @@ checkable, not narrative** — a record that fabricates is worse than a gap.
 
 ---
 layout: section
+class: section-slide
 ---
 
 # LAB 2
@@ -1999,7 +2047,7 @@ industry, and your evidence records are what you'll argue with.
 
 ---
 layout: section
-class: text-center
+class: thesis
 ---
 
 # Module 3
@@ -2010,6 +2058,7 @@ class: text-center
 
 ---
 layout: section
+class: section-slide
 ---
 
 # Close

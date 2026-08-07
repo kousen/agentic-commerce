@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'slides.md'
+      - 'style.css'
+      - 'components/**'
+      - 'setup/**'
       - 'public/**'
       - 'package.json'
       - 'package-lock.json'

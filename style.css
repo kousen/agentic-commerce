@@ -1,0 +1,261 @@
+/* Course visual identity — sibling of the TicketNetwork talk deck.
+   Palette lifted from that deck's export; Caslon added as the "mandate document"
+   display voice. Single dark theme by design: this deck is projected. */
+
+:root {
+  --ink: #101214;
+  --ink-2: #1e2226;
+  --ink-3: #3d4349;
+  --paper: #edeff1;
+  --paper-dim: #b2b7bb;
+  --grey: #8d9499;
+  --petrol: #6aaec3;
+  --petrol-deep: #047090;
+  --petrol-dark: #024b60;
+  --petrol-faint: #d7e8ee;
+  --refuse: #d06565;
+  --warn: #c9a227;
+  --allow: #66a87f;
+}
+
+/* ---- ground ---- */
+
+.slidev-layout {
+  background: var(--ink);
+  color: var(--paper-dim);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+/* ---- type scale ---- */
+
+.slidev-layout h1 {
+  font-family: 'Libre Caslon Text', serif;
+  color: var(--paper);
+  font-size: 1.9rem;
+  line-height: 1.2;
+  text-wrap: balance;
+  border-bottom: 1px solid var(--ink-3);
+  padding-bottom: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.slidev-layout h1 + p {
+  margin-top: -0.4rem;
+}
+
+.slidev-layout h2 {
+  font-family: 'Libre Caslon Text', serif;
+  color: var(--paper);
+}
+
+.slidev-layout strong {
+  color: var(--petrol-faint);
+  font-weight: 600;
+}
+
+.slidev-layout em {
+  color: var(--paper);
+}
+
+.slidev-layout a {
+  color: var(--petrol);
+  border-bottom: none;
+}
+
+/* ---- cover ---- */
+
+.slidev-layout.cover {
+  background: linear-gradient(160deg, var(--ink) 55%, var(--petrol-dark) 160%);
+}
+
+.slidev-layout.cover h1 {
+  font-family: 'Libre Caslon Text', serif;
+  font-size: 3.6rem;
+  border-bottom: none;
+  color: var(--paper);
+}
+
+.slidev-layout.cover h1 + p,
+.slidev-layout.cover .subtitle {
+  color: var(--petrol);
+}
+
+/* ---- section dividers ---- */
+
+.slidev-layout.section-slide {
+  background: linear-gradient(160deg, var(--ink-2) 40%, var(--ink) 100%);
+  border-left: 6px solid var(--petrol-deep);
+}
+
+.slidev-layout.section-slide h1 {
+  font-family: 'Libre Caslon Text', serif;
+  font-size: 2.9rem;
+  border-bottom: none;
+  color: var(--paper);
+}
+
+.slidev-layout.section-slide h2 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 1.35rem;
+  color: var(--petrol);
+  letter-spacing: 0.01em;
+}
+
+/* ---- the three module-thesis slides: the one loud place ---- */
+
+.slidev-layout.thesis {
+  background: var(--ink);
+  border-left: 6px solid var(--petrol);
+}
+
+.slidev-layout.thesis h1 {
+  font-size: 2rem;
+  color: var(--grey);
+  border-bottom: none;
+}
+
+.slidev-layout.thesis h2 {
+  font-family: 'Libre Caslon Text', serif;
+  font-size: 2.5rem;
+  line-height: 1.35;
+  color: var(--paper);
+  text-wrap: balance;
+}
+
+/* ---- tables: hairline ledger ---- */
+
+.slidev-layout table {
+  font-variant-numeric: tabular-nums;
+  border-collapse: collapse;
+}
+
+.slidev-layout th {
+  color: var(--petrol);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.82em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1.5px solid var(--petrol-deep);
+  text-align: left;
+}
+
+.slidev-layout td {
+  border-bottom: 1px solid var(--ink-3);
+  border-top: none;
+}
+
+.slidev-layout tr {
+  border: none;
+}
+
+/* ---- blockquotes: verbatim exhibits ---- */
+
+.slidev-layout blockquote {
+  background: var(--ink-2);
+  border-left: 3px solid var(--petrol-deep);
+  border-radius: 0;
+  padding: 0.7rem 1rem;
+  color: var(--paper-dim);
+  font-style: italic;
+}
+
+.slidev-layout blockquote p {
+  font-size: 1em;
+}
+
+/* ---- code: terminal ledger ---- */
+
+.slidev-layout pre,
+.slidev-layout code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.slidev-layout :not(pre) > code {
+  background: var(--ink-2);
+  color: var(--petrol-faint);
+  border: 1px solid var(--ink-3);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  font-size: 0.85em;
+}
+
+.slidev-layout .slidev-code-wrapper,
+.slidev-layout pre.slidev-code {
+  background: var(--ink-2) !important;
+  border: 1px solid var(--ink-3);
+  border-radius: 6px;
+}
+
+/* ---- artifact chips: the ticket-stub pointer to the repo ---- */
+
+.artifact {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78em;
+  color: var(--petrol);
+  background: var(--ink-2);
+  border: 1px dashed var(--petrol-deep);
+  border-radius: 3px;
+  padding: 0.05em 0.55em;
+  letter-spacing: 0.01em;
+  vertical-align: baseline;
+}
+
+/* ---- semantic marks, used sparingly ---- */
+
+.ok    { color: var(--allow); }
+.no    { color: var(--refuse); }
+.warn  { color: var(--warn); }
+
+/* ---- screenshots: framed on a raised panel ---- */
+
+.slidev-layout img {
+  border: 1px solid var(--ink-3);
+  border-radius: 6px;
+}
+
+.slidev-layout.image-frame img,
+img.shot {
+  background: var(--ink-2);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.45);
+}
+
+/* seriph's image-right pane: keep the screenshot framed, not full-bleed */
+.slidev-layout .my-auto img {
+  max-height: 92%;
+  object-fit: contain;
+}
+
+/* ---- footer breathing room so the FrontDoor rail never collides ---- */
+
+.slidev-layout.has-frontdoor {
+  padding-bottom: 4.2rem;
+}
+
+/* ---- wall-poster statements: the Caslon voice ---- */
+
+.slidev-layout .text-2xl {
+  font-family: 'Libre Caslon Text', serif;
+  color: var(--paper);
+}
+
+/* the front-door numbered list on the question slide */
+.fd-n {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--petrol);
+  font-size: 0.85em;
+  margin-right: 0.2rem;
+}
+.slidev-layout .grid b {
+  color: var(--paper);
+  font-weight: 600;
+}
+
+/* an all-empty header row shouldn't draw a rule */
+.slidev-layout th:empty {
+  border-bottom-color: transparent;
+}
