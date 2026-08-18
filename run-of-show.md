@@ -41,8 +41,14 @@ Narrate whatever happens.
 ## Pre-flight (before class — ~30 minutes)
 
 1. **Reset the demo data** — not optional; §2.3 reads order history and rehearsal
-   leftovers change what the agent infers:
-   `POST https://mockhub.kousenit.com/api/v1/admin/demo/reset` (admin credentials).
+   leftovers change what the agent infers. The reset is **per-user**: log in as admin
+   (`POST /api/v1/auth/login`), then for each of `buyer@mockhub.com`,
+   `alice@mockhub.com`, and `bob@mockhub.com`:
+   `POST https://mockhub.kousenit.com/api/v1/admin/demo/reset` with
+   `Authorization: Bearer <admin token>` and body `{ "userEmail": "<email>" }`
+   (a missing email is a bodiless 400). Safe by design — reset returns accounts to
+   the *seeded* state, not to zero. It also **revokes the demo mandates**, which is
+   why step 2 must follow it.
 2. **Re-mint demo mandates** — `cd demos && npm install`, then
    `npx tsx src/probe.ts src/naive-identity.ts` and
    `npx tsx src/probe.ts src/injected-provider.ts` (each server auto-creates its mandate
