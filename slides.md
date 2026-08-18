@@ -200,7 +200,7 @@ class: section-slide
 
 # Thirty years of bot defense assumed one thing
 
-<div class="pt-6">
+<div class="pt-2">
 
 CAPTCHAs, rate limits, device fingerprinting, verified-fan queues —
 even a federal statute (the BOTS Act, 2016, actively enforced again since 2025).
@@ -209,7 +209,7 @@ even a federal statute (the BOTS Act, 2016, actively enforced again since 2025).
 
 <v-click>
 
-<div class="pt-8 text-xl text-center">
+<div class="pt-4 text-xl text-center">
 
 **A bot on your site is an adversary.**
 
@@ -219,7 +219,7 @@ even a federal statute (the BOTS Act, 2016, actively enforced again since 2025).
 
 <v-click>
 
-<div class="pt-8">
+<div class="pt-4">
 
 | The adversarial bot | The delegated agent |
 |---|---|
