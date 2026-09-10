@@ -34,7 +34,7 @@ institutional backing; production deployments still pilot-stage.
 
 **ACP — Agentic Commerce Protocol.** OpenAI + Stripe, checkout-focused, still beta and not
 yet foundation-governed. Its flagship surface (ChatGPT Instant Checkout) was retired in
-March 2026 after roughly a dozen merchants went live; the spec survives via Stripe's
+March 2026 after only a few dozen merchants went live; the spec survives via Stripe's
 Agentic Commerce Suite. A useful cautionary tale about protocol vs. product.
 
 **UCP — Universal Commerce Protocol.** Google + Shopify, announced January 2026, Apache 2.0.

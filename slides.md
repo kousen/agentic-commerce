@@ -430,7 +430,7 @@ Visa and Mastercard.
 <v-clicks>
 
 - Create, update, complete, or cancel a checkout; product feed; delegated payment tokens
-- **The cautionary tale:** ChatGPT Instant Checkout retired March 2026 after ~a dozen merchants — single item only, scraped product data, no sales-tax remittance
+- **The cautionary tale:** ChatGPT Instant Checkout retired March 2026 after only a few dozen merchants — single item only, scraped product data, no sales-tax remittance
 - The bottleneck was never the AI. It was **commerce plumbing and stale data.**
 - The spec survives via Stripe's Agentic Commerce Suite
 
