@@ -16,3 +16,4 @@ ticketnetwork-agentic-commerce/
 dist-check/
 .slidev/
 agentic-commerce-slides.pdf
+bin/

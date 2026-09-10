@@ -96,7 +96,7 @@ structure-not-authority point.
 `approvePurchase` fires, say nothing for two beats. Then: *nothing malfunctioned.*
 
 **New in v2 — the `2acc16c` slide:** the real platform made the same mistake and fixed
-it eleven days before the first demo of this course. Read the commit message aloud;
+it eleven days before the first delivery of this course (August 2026). Read the commit message aloud;
 "approval now lives only where the agent cannot reach" is the segment's thesis in the
 platform's own words.
 
@@ -151,7 +151,8 @@ loud. It seeds the best questions of the day.
 **Where to start** — the six steps, with "steps one and two cost almost nothing." Then
 the protocol argument, now earned. Then the checklist slide — in v2 every line points at
 an artifact in the repo; say that sentence, it's the difference between a poster and a
-toolkit. Q&A.
+toolkit. Then, **before the survey link appears**, ask for feedback out loud: the first
+delivery got 12 responses from 130 attendees. Q&A.
 
 ## If something breaks
 
