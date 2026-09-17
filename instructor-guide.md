@@ -12,6 +12,12 @@ Companion documents: `demo-runbook.md` (per-demo prompts and failure modes), `la
 
 - [ ] `POST /api/v1/admin/demo/reset` on MockHub. **Not optional** — §2.3 reads the
       buyer's order history, and rehearsal leftovers change what the agent infers.
+- [ ] `POST /api/v1/admin/ticketmaster/repair-listings` on MockHub (admin token), then
+      `./scripts/verify-mockhub.sh`. The nightly Ticketmaster sync can import events
+      with no inventory; on 2026-09-16, 213 of 236 events had zero listings until the
+      repair ran mid-class. The repair takes ~15 minutes and returns a 502 from the
+      Railway proxy at 300s, but keeps running server-side — watch `railway logs` for
+      "listing repair complete".
 - [ ] Start each demo server once so mandates are minted: `cd demos && npm install`,
       then `npx tsx src/probe.ts src/<server>.ts` for naive-identity, injected-provider.
 - [ ] Run both labs yourself, all tracks: Lab 1 tracks take 30 seconds together; for

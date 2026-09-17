@@ -70,6 +70,18 @@ check "agent credential cannot approve a purchase" \
   "$(curl -s --max-time 15 -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/agent-approvals/any/approve" -H "X-API-Key: $KEY")" \
   "401"
 
+# Inventory: every event on the first page the web UI shows must have at least one
+# listing. 2026-09-16: 213 of 236 Ticketmaster events had none until
+# POST /api/v1/admin/ticketmaster/repair-listings was run mid-class.
+check "no empty events on the first page" \
+  "$(curl -s --max-time 15 "$BASE/api/v1/events?size=25" | python3 -c '
+import sys, json, urllib.request
+base = sys.argv[1]
+empty = [e["name"] for e in json.load(sys.stdin)["content"]
+         if not json.load(urllib.request.urlopen(base + "/api/v1/events/" + e["slug"] + "/listings?size=1", timeout=15))]
+print(len(empty))' "$BASE")" \
+  "0"
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
