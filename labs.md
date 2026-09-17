@@ -69,6 +69,8 @@ boundary in the lab would be decorative. An agent that can mint its own mandate 
 itself any ceiling, any scope, any approval mode. The artifact the model cannot mint is the
 entire foundation — which is exactly why it's the one you should not take our word for.
 
+Solutions for all three tracks are in `labs/SOLUTIONS.md` — after you've written your own.
+
 ## What each test actually does (walkthrough reference)
 
 1. **Ceiling** — creates a mandate with a $1.00 per-transaction limit, then has the agent
