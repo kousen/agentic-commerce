@@ -9,7 +9,7 @@
     "export": "slidev export --output agentic-commerce-slides.pdf"
   },
   "devDependencies": {
-    "@slidev/cli": "^51.8.1",
+    "@slidev/cli": "^53.0.0",
     "@slidev/theme-seriph": "^0.25.0",
     "playwright-chromium": "^1.53.1"
   }
