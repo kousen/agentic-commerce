@@ -21,7 +21,7 @@ along the way.
    UCP, TAP, BOTS Act), with primary sources.
 
 **Slides:** [download the current PDF](https://github.com/kousen/agentic-commerce/releases/latest/download/agentic-commerce-slides.pdf)
-— rebuilt automatically on every change.
+or [read them in the browser](<https://kousen.github.io/agentic-commerce/>) — both rebuilt automatically on every change.
 
 ## What's here
 
