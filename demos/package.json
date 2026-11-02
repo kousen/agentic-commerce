@@ -11,7 +11,7 @@
     "guarded": "tsx src/guarded-tools.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/client": "^2.0.0",
+    "@modelcontextprotocol/client": "^2.3.0",
     "@modelcontextprotocol/server": "^2.0.0",
     "tsx": "^4.19.0",
     "zod": "^4.0.0"
